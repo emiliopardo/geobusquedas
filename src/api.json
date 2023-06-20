@@ -1,0 +1,39 @@
+{
+  "url": {
+    "name": "Geobusquedas",
+    "separator": "*"
+  },
+  "constructor": "M.plugin.Geobusquedas",
+  "parameters": [],
+  "files": {
+    "ol": {
+      "scripts": [],
+      "styles": []
+    }
+  },
+  "metadata": {
+    "uuid_plugin": "",
+    "uuid_version_plugin": "",
+    "version_ficha_metadatos": "",
+    "name": "Geobusquedas",
+    "description": "Description of the plugin",
+    "text": "A full text about plugin",
+    "version": "1.0.0",
+    "date": "",
+    "author": "",
+    "org": "",
+    "tags": "mapea,plugin",
+    "icon": "./facade/assets/icons/icons.svg",
+    "buttons": [
+      { "title": "", "description": "", "querySelector": "" },
+      { "title": "", "description": "", "querySelector": "" }
+    ],
+    "dependencies": {
+      "modules": ["", ""],
+      "plugins": [{ "uuid": "", "name": "" }],
+      "services": [{ "name": "", "description": "" }]
+    },
+    "compatibility": ["6.3.1"],
+    "centralized": "false"
+  }
+}
