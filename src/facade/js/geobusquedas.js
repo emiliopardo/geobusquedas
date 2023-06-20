@@ -16,7 +16,7 @@ export default class Geobusquedas extends M.Plugin {
    * @param {Object} impl implementation object
    * @api stable
    */
-  constructor() {
+  constructor(parameters) {
     super();
     /**
      * Facade of the map
@@ -24,6 +24,16 @@ export default class Geobusquedas extends M.Plugin {
      * @type {M.Map}
      */
     this.map_ = null;
+    this.config_ = parameters.config;
+    this.options_ = parameters.options;
+    this.url_ = this.config_.url
+    this.position_ = parameters. options.position || 'TL';
+
+    if (this.position_ === 'TL' || this.position_ === 'BL') {
+      this.positionClass_ = 'left';
+    } else {
+      this.positionClass_ = 'right';
+    }
 
     /**
      * Array of controls
@@ -56,13 +66,15 @@ export default class Geobusquedas extends M.Plugin {
    * @api stable
    */
   addTo(map) {
-    this.controls_.push(new GeobusquedasControl());
+    this.controls_.push(new GeobusquedasControl(this.config_));
     this.map_ = map;
     // panel para agregar control - no obligatorio
     this.panel_ = new M.ui.Panel('panelGeobusquedas', {
       collapsible: true,
-      position: M.ui.position.TR,
+      className: `geobusquedas-panel ${this.positionClass_}`,
       collapsedButtonClass: 'g-cartografia-flecha-izquierda',
+      position: M.ui.position[this.position_],
+      tooltip: this.config_.title,
     });
     this.panel_.addControls(this.controls_);
     this.panel_.on(M.evt.ADDED_TO_MAP, () => {
