@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 /**
  * @module M/control/GeobusquedasControl
  */
@@ -15,7 +17,7 @@ export default class GeobusquedasControl extends M.Control {
    * @extends {M.Control}
    * @api stable
    */
-  constructor() {
+  constructor(config) {
     // 1. checks if the implementation can create PluginControl
     if (M.utils.isUndefined(GeobusquedasImplControl)) {
       M.exception('La implementación usada no puede crear controles GeobusquedasControl');
@@ -23,6 +25,7 @@ export default class GeobusquedasControl extends M.Control {
     // 2. implementation of this control
     const impl = new GeobusquedasImplControl();
     super(impl, 'Geobusquedas');
+    this.config_ = config;
 
     // captura de customevent lanzado desde impl con coords
     window.addEventListener('mapclicked', (e) => {
@@ -63,6 +66,8 @@ export default class GeobusquedasControl extends M.Control {
       const html = M.template.compileSync(template);
       // Añadir código dependiente del DOM
       success(html);
+      this.getFields()
+      this.getIndexs()
     });
   }
 
@@ -124,4 +129,17 @@ export default class GeobusquedasControl extends M.Control {
   }
 
   // Add your own functions
+
+  getIndexs() {
+    M.remote.get(this.config_.url+"/indices?format=json").then((response)=>{
+      console.log(JSON.parse(response.text))
+    })
+  }
+
+  getFields(){
+    M.remote.get(this.config_.url+"/_all/fields").then((response)=>{
+      console.log(JSON.parse(response.text))
+    })
+  }    
+
 }
