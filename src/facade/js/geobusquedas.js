@@ -27,7 +27,7 @@ export default class Geobusquedas extends M.Plugin {
     this.config_ = parameters.config;
     this.options_ = parameters.options;
     this.url_ = this.config_.url
-    this.position_ = parameters. options.position || 'TL';
+    this.position_ = parameters.options.position || 'TL';
 
     if (this.position_ === 'TL' || this.position_ === 'BL') {
       this.positionClass_ = 'left';
@@ -90,7 +90,7 @@ export default class Geobusquedas extends M.Plugin {
    * @function
    * @api stable
    */
-  getMetadata(){
+  getMetadata() {
     return this.metadata_;
   }
 
