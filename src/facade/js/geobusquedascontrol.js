@@ -3,7 +3,7 @@
 /**
  * @module M/control/GeobusquedasControl
  */
-
+import Choices from 'choices.js';
 import GeobusquedasImplControl from 'impl/geobusquedascontrol';
 import template from 'templates/geobusquedas';
 
@@ -26,11 +26,6 @@ export default class GeobusquedasControl extends M.Control {
     const impl = new GeobusquedasImplControl();
     super(impl, 'Geobusquedas');
     this.config_ = config;
-    this.indexList_ = Array();
-    this.fieldList_ = Array();
-    this.indexConfig_ = new Array();
-    this.getFields();
-    this.getIndexs();
   }
 
   /**
@@ -42,19 +37,17 @@ export default class GeobusquedasControl extends M.Control {
    * @api stable
    */
   createView(map) {
-    // let templateVars = { vars: { title: this.title, fields: this.fields } };
-    let templateVars = { vars: { title: this.config_.title } };
-    //let templateVars = { vars: {} };
-
+    this.templateVars_ = { vars: { title: this.config_.title } };
     return new Promise((success, fail) => {
-      // console.log(this.fieldList_)
-      // console.log(this.indexList_)
-      console.log(this.indexConfig_)
-      const html = M.template.compileSync(template, templateVars);
+      const html = M.template.compileSync(template, this.templateVars_);
       // Añadir código dependiente del DOM
       this.element = html;
-      this.addEvents(html, this.fields);
-      success(html);
+      // hasta que no optenga la respuesta de los indices no cargo la plantilla ni los eventos
+      this.getIndexs().then((response) => {
+        this.selectIndexOptions_ = response
+        this.addEvents(html);
+        success(html);
+      })
     });
   }
 
@@ -108,22 +101,43 @@ export default class GeobusquedasControl extends M.Control {
 
   addEvents(html) {
     console.log("addEvents")
+    /* SE ACCEDE A LOS SELECTORES */
+    this.selectorIndicesEL = html.querySelectorAll('select#selectorIndices')[0];
+    console.log(this.selectorIndicesEL)
+    /* SE CREAN Y CONFIGURAR LOS CHOICE.JS*/
+    this.choicesSelectorIndicesEL = new Choices(this.selectorIndicesEL,{ allowHTML: true,  removeItemButton: true, placeholderValue: 'Seleccione un indice', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true,
+    shouldSortItems: true,});
   }
 
+
   getIndexs() {
+    let indexList_ = new Array()
     M.remote.get(this.config_.url + "/indices?format=json").then((response) => {
       let responseIndexList = JSON.parse(response.text);
       responseIndexList.forEach(element => {
         let indexName = element["index"]
         if (!indexName.includes(".")) {
-          this.indexList_.push(indexName);
+          let my_option = {
+            value: indexName,
+            label: indexName,
+            selected: false,
+            disabled: false,
+          }
+
+          indexList_.push(my_option);
         }
       });
+      //defino el listado de opciones del choice
+      this.choicesSelectorIndicesEL.setChoices(indexList_)
+    })
+    return new Promise((success, fail) => {
+      success(indexList_)
     })
   }
 
-  getFields() {
-    M.remote.get(this.config_.url + "/_all/fields").then((response) => {
+  getFields(my_index) {
+    let indexConfig_ = new Array()
+    M.remote.get(this.config_.url + "/"+my_index+"/fields").then((response) => {
       let responseFieldList = JSON.parse(response.text);
       let indexNameList = Object.keys(responseFieldList)
       indexNameList.forEach(element => {
@@ -133,9 +147,14 @@ export default class GeobusquedasControl extends M.Control {
             index: element,
             fields: fieldsList
           }
-          this.indexConfig_.push(indexInfo);
+          indexConfig_.push(indexInfo);
         }
       });
     })
+    return new Promise((success, fail) => {
+        
+      success(indexConfig_)
+    })
   }
+
 }
