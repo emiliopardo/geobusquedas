@@ -26,11 +26,11 @@ export default class GeobusquedasControl extends M.Control {
     const impl = new GeobusquedasImplControl();
     super(impl, 'Geobusquedas');
     this.config_ = config;
-
-    // captura de customevent lanzado desde impl con coords
-    window.addEventListener('mapclicked', (e) => {
-      this.map_.addLabel('Hola Mundo!', e.detail);
-    });
+    this.indexList_ = Array();
+    this.fieldList_ = Array();
+    this.indexConfig_ = new Array();
+    this.getFields();
+    this.getIndexs();
   }
 
   /**
@@ -42,32 +42,19 @@ export default class GeobusquedasControl extends M.Control {
    * @api stable
    */
   createView(map) {
-    if (!M.template.compileSync) { // JGL: retrocompatibilidad Mapea4
-      M.template.compileSync = (string, options) => {
-        let templateCompiled;
-        let templateVars = {};
-        let parseToHtml;
-        if (!M.utils.isUndefined(options)) {
-          templateVars = M.utils.extends(templateVars, options.vars);
-          parseToHtml = options.parseToHtml;
-        }
-        const templateFn = Handlebars.compile(string);
-        const htmlText = templateFn(templateVars);
-        if (parseToHtml !== false) {
-          templateCompiled = M.utils.stringToHtml(htmlText);
-        } else {
-          templateCompiled = htmlText;
-        }
-        return templateCompiled;
-      };
-    }
-    
+    // let templateVars = { vars: { title: this.title, fields: this.fields } };
+    let templateVars = { vars: { title: this.config_.title } };
+    //let templateVars = { vars: {} };
+
     return new Promise((success, fail) => {
-      const html = M.template.compileSync(template);
+      // console.log(this.fieldList_)
+      // console.log(this.indexList_)
+      console.log(this.indexConfig_)
+      const html = M.template.compileSync(template, templateVars);
       // Añadir código dependiente del DOM
+      this.element = html;
+      this.addEvents(html, this.fields);
       success(html);
-      this.getFields()
-      this.getIndexs()
     });
   }
 
@@ -81,13 +68,6 @@ export default class GeobusquedasControl extends M.Control {
   activate() {
     // calls super to manage de/activation
     super.activate();
-    const div = document.createElement('div');
-    div.id = 'msgInfo';
-    div.classList.add('info');
-    div.innerHTML = 'Haz doble click sobre el mapa';
-    this.map_.getContainer().appendChild(div);
-
-    this.getImpl().activateClick(this.map_);
   }
   /**
    * This function is called on the control deactivation
@@ -99,10 +79,6 @@ export default class GeobusquedasControl extends M.Control {
   deactivate() {
     // calls super to manage de/activation
     super.deactivate();
-    const div = document.getElementById('msgInfo');
-    this.map_.getContainer().removeChild(div);
-
-    this.getImpl().deactivateClick(this.map_);
   }
   /**
    * This function gets activation button
@@ -130,16 +106,36 @@ export default class GeobusquedasControl extends M.Control {
 
   // Add your own functions
 
+  addEvents(html) {
+    console.log("addEvents")
+  }
+
   getIndexs() {
-    M.remote.get(this.config_.url+"/indices?format=json").then((response)=>{
-      console.log(JSON.parse(response.text))
+    M.remote.get(this.config_.url + "/indices?format=json").then((response) => {
+      let responseIndexList = JSON.parse(response.text);
+      responseIndexList.forEach(element => {
+        let indexName = element["index"]
+        if (!indexName.includes(".")) {
+          this.indexList_.push(indexName);
+        }
+      });
     })
   }
 
-  getFields(){
-    M.remote.get(this.config_.url+"/_all/fields").then((response)=>{
-      console.log(JSON.parse(response.text))
+  getFields() {
+    M.remote.get(this.config_.url + "/_all/fields").then((response) => {
+      let responseFieldList = JSON.parse(response.text);
+      let indexNameList = Object.keys(responseFieldList)
+      indexNameList.forEach(element => {
+        if (!element.includes(".")) {
+          let fieldsList = responseFieldList[element]["mappings"]["properties"];
+          let indexInfo = {
+            index: element,
+            fields: fieldsList
+          }
+          this.indexConfig_.push(indexInfo);
+        }
+      });
     })
-  }    
-
+  }
 }
