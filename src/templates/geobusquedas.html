@@ -1,3 +1,58 @@
 <div id="div-contenedor" class="m-control m-container m-geobusquedas">
-  <button id="ctrlTest" class="g-cartografia-bandera" title="AddFeature"></button>
+  <div class="m-geobusquedas">
+    <!-- TITLE -->
+    <div class="m-geobusquedas-title">{{title}}</div>
+    <!-- BODY-->
+    <div class="m-geobusquedas-body">
+      <div id="m-geobusquedas-content">
+        <!--
+        {{#each fields}}
+        <div id="field_{{field}}" class="m-geobusquedas-opciones-busqueda">
+          <label class="m-geobusquedas-label-opciones-busqueda" for="textbox{{alias}}">{{alias}}</label>
+          <input id="{{field}}" name="textbox{{alias}}" type="text" maxlength="150" placeholder="{{alias}} ...">
+          <span class="m-geobusquedas-info-opciones">* {{label}}</span>
+        </div>
+        {{/each}}
+        -->
+      </div>
+      <div id="m-geobusquedas-result-content" class="results">
+        <!--
+        <div id="results" class="results">
+          <table class="center">
+            <tbody>
+              <tr>
+                <th class="noResults" colspan="2">
+                  <p>No se ha encontrado ningún resultado</p>
+                </th>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      -->
+      </div>
+      <div id="m-geobusquedas-result-pagination" class="page">
+        <!--
+        <div class="page">
+          <table style="width:100%">
+            <tbody>
+              <tr>
+                <td id="previusPage" class="g-cartografia-flecha-izquierda">Atrás</td>
+                <td id="recordsInfo"><span id="recordsNumber" class="found">0</span> de
+                  <span id="recordsTotal" class="total">0</span>
+                </td>
+                <td id="nextPage" class="g-cartografia-flecha-derecha">Siguiente</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      -->
+      </div>
+      <div class="m-geobusquedas-buttons">
+        <button id="m-geobusquedas-loadButton" class="load" disabled="disabled" title="Ejecutar">
+          <i class="g-cartografia-posicion3"></i> Ejecutar</button>
+        <button id="m-geobusquedas-clearButton" class="clear" disabled="disabled" title="Limpiar">
+          <i class="g-cartografia-check4"></i> Limpiar</button>
+      </div>
+    </div>
+  </div>
 </div>

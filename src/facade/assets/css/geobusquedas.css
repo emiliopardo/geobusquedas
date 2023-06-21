@@ -1,25 +1,73 @@
-/** Estilos sobreescritos */
-.g-cartografia-flecha-izquierda {
-  color: #00796B !important;
-}
-.g-cartografia-flecha-derecha {
-  color: #536DFE !important;
-}
-.m-control.activated>button {
-  color: rgb(255, 0, 0) !important;
+.m-areas > div.m-area > div.m-panel.geobusquedas-panel.collapsed {
+  background-color: #00796b !important;
+  width: 40px;
+  height: 40px;
+  order: -100 !important;
+  -webkit-order: -100 !important;
 }
 
-/** Estilos propios*/
-.info{
-  position : absolute;
-  width : 60%;
-  padding : 5px;
-  top : 10px;
-  left : 20%;
-  background : rgba(245, 245, 245, 0.8);
-  font-size : large;
-  border-radius : 5px;
-  border-style: dashed;
-  border-width: 2px;
+.m-areas > div.m-area > div.m-panel.geobusquedas-panel.opened {
+  visibility: visible;
+  background-color: transparent !important;
+  box-shadow: none;
+  margin-bottom: 0px;
+  margin-left: 0px;
+  margin-right: 0px;
+  margin-top: 0px;
+  z-index: 1000;
+  order: -100 !important;
+  -webkit-order: -100 !important;
+}
+
+.m-areas > div.m-area > div.m-panel.geobusquedas-panel.opened > button.m-panel-btn {
+  background-color: #00796b !important;
+  color: #fff !important;
+}
+
+.m-areas
+  > div.m-area
+  > div.m-panel.geobusquedas-panel.collapsed
+  > button.m-panel-btn {
+  background-color: #00796b !important;
+  color: #fff !important;
+}
+
+.m-areas > div.m-area > div.m-panel.geobusquedas-panel.opened > div.m-panel-controls {
+  opacity: 1;
+  border-radius: 10px;
+  -webkit-transition: max-width 1s ease 0s, opacity 0.75s ease 0.1s;
+  transition: max-width 1s ease 0s, opacity 0.75s ease 0.1s;
+}
+
+.m-areas
+  > div.m-area
+  > div.m-panel.geobsquedas-panel.opened
+  > div.m-panel-controls
+  > div.m-geobusquedas {
+  width: 25vw !important;
+  height: 100vh !important;
+  background-color: #fff !important;
+}
+
+div.m-geobusquedas-title {
+  line-height: 40px;
   text-align: center;
+  height: 39px;
+  width: 100%;
+  padding: 5 5 5 0;
+  border-bottom: 2px solid #ff9800;
+  font-size: 15px;
+  background-color: #00796b !important;
+  color: #fff;
+}
+
+.m-geobusquedas-container > div.body {
+  background-color: #fff;
+  width: 25vh !important;
+  height: 100vh !important;
+}
+
+#m-geobusquedas-content {
+  height: calc(100vh - 90px);
+  overflow-y: auto;
 }
