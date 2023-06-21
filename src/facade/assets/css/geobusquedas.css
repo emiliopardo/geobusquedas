@@ -1,3 +1,47 @@
+@import url(choices.css);
+
+.choices__inner {
+  width: 96% !important;
+  min-height: 24px !important;
+  font-size: 12px !important;
+}
+
+.choices__input {
+  font-size: 13px !important;
+}
+
+.choices {
+  margin-bottom: 10px !important;
+}
+
+.choices__list--dropdown .choices__item,
+.choices__list[aria-expanded] .choices__item {
+  font-size: 12px !important;
+}
+
+.choices__list--multiple .choices__item {
+  background-color: #00897b !important;
+  border: 1px solid rgba(0, 0, 0, .13) !important;
+}
+
+.m-geobusquedas {
+  width: 25vw;
+  font-family: Muli,sans-serif!important;
+  font-size: 13px;
+  color: #6c6c6c;
+  background-color: #fff;
+  letter-spacing: normal;
+  word-spacing: normal;
+  text-transform: none;
+  text-indent: 0;
+  text-shadow: none;
+  -webkit-rtl-ordering: logical;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  user-select: text;
+  -webkit-font-smoothing: antialiased;
+}
+
 .m-areas > div.m-area > div.m-panel.geobusquedas-panel.collapsed {
   background-color: #00796b !important;
   width: 40px;
@@ -44,7 +88,7 @@
   > div.m-panel.geobsquedas-panel.opened
   > div.m-panel-controls
   > div.m-geobusquedas {
-  width: 25vw !important;
+  width: 33vw !important;
   height: 100vh !important;
   background-color: #fff !important;
 }
@@ -69,5 +113,69 @@ div.m-geobusquedas-title {
 
 #m-geobusquedas-content {
   height: calc(100vh - 90px);
+  background-color: #fff;
   overflow-y: auto;
 }
+#m-geobusquedas-buttons {
+  height: 90px;
+  background-color: #fff;
+  overflow-y: auto;
+}
+
+div.opciones-busqueda {
+  margin: 10px;
+}
+
+.label-opciones-busqueda {
+  margin: 0px 0px 0px 0px;
+}
+
+.info-opciones {
+  font-size: 0.8em;
+  display: block;
+}
+
+label {
+  display: block;
+  margin: 0 0 -1px;
+  padding: 10px;
+  font-weight: 600;
+  text-align: center;
+  color: #bbb;
+  background-color: #fff;
+}
+
+.select{
+  display: block;
+}
+
+.button {
+  width: 100%;
+  height: 50px;
+  margin: 0 auto;
+  text-align: center;
+  background-color: #ffb74d;
+}
+
+div.button>button {
+  width: 39%;
+  margin: 10px 5%;
+  padding: 5px;
+  background-color: #fff;
+  font-family: Muli, "sans-serif" !important;
+  cursor: pointer;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.4);
+  font-size: 15px;
+  line-height: 25px;
+  opacity: 0.75;
+  -webkit-transition: opacity 0.25s ease 0s;
+  transition: opacity 0.25s ease 0s;
+  color: #404040 !important;
+}
+
+div.button>button:disabled {
+  cursor: not-allowed;
+}
+
+
