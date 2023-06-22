@@ -2,12 +2,12 @@
 
 .choices__inner {
   width: 96% !important;
-  min-height: 24px !important;
-  font-size: 12px !important;
+  min-height: 15px !important;
+  font-size: 10px !important;
 }
 
 .choices__input {
-  font-size: 13px !important;
+  font-size: 10px !important;
 }
 
 .choices {
@@ -16,7 +16,7 @@
 
 .choices__list--dropdown .choices__item,
 .choices__list[aria-expanded] .choices__item {
-  font-size: 12px !important;
+  font-size: 10px !important;
 }
 
 .choices__list--multiple .choices__item {
@@ -123,11 +123,13 @@ div.m-geobusquedas-title {
 }
 
 div.opciones-busqueda {
-  margin: 10px;
+  margin-left: 5px;
+  margin-right: 5px;
 }
 
 .label-opciones-busqueda {
   margin: 0px 0px 0px 0px;
+  font-size: 11px;
 }
 
 .info-opciones {
@@ -138,7 +140,7 @@ div.opciones-busqueda {
 label {
   display: block;
   margin: 0 0 -1px;
-  padding: 10px;
+  padding: 5px;
   font-weight: 600;
   text-align: center;
   color: #bbb;
