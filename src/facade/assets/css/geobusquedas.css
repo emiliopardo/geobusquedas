@@ -105,6 +105,11 @@ div.m-geobusquedas-title {
   color: #fff;
 }
 
+input#textArea {
+  width: 23vw;
+  height:50px
+}
+
 .m-geobusquedas-container > div.body {
   background-color: #fff;
   width: 25vh !important;
