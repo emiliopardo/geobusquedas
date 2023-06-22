@@ -6,6 +6,8 @@ const map = M.map({
   container: 'mapjs',
 });
 
+map.addControls(['scale', 'layerswitcher']);
+
 
 var configuracion = {
   config:{
