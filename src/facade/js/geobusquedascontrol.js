@@ -196,9 +196,7 @@ export default class GeobusquedasControl extends M.Control {
 
   search(index, fields) {
     let request
-    
     if (this.selectorTextAreaEL.value==''){
-      console.log('no se ha introducido nada');
       request = {
         "query": {
           "match_all": {},
@@ -217,14 +215,11 @@ export default class GeobusquedasControl extends M.Control {
     M.proxy(false);
     fields.push("geom")
     let url = this.config_.url + '/' + index + '/search?'
-
-    
+      
     M.remote.post(url, request).then((res) => {
       let layerList = this.map_.getLayers()
       layerList.forEach(layer => {
         if (layer.name == index) {
-          console.log(layer.name)
-          console.log(index)
           this.map_.removeLayers(layer)
         }
       });
