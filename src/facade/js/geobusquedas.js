@@ -79,6 +79,7 @@ export default class Geobusquedas extends M.Plugin {
     this.panel_.addControls(this.controls_);
     this.panel_.on(M.evt.ADDED_TO_MAP, () => {
       this.fire(M.evt.ADDED_TO_MAP);
+      this.panel_.open()
     });
     map.addPanels(this.panel_);
   }
