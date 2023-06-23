@@ -4,6 +4,8 @@
  * @module M/control/GeobusquedasControl
  */
 import Choices from 'choices.js';
+import { EditorView, basicSetup } from "codemirror"
+import { json } from "@codemirror/lang-json"
 import GeobusquedasImplControl from 'impl/geobusquedascontrol';
 import template from 'templates/geobusquedas';
 
@@ -27,6 +29,19 @@ export default class GeobusquedasControl extends M.Control {
     super(impl, 'Geobusquedas');
     this.config_ = config;
     this.MAX_QUERY_SIZE = 10000;
+
+    this.estilo = new M.style.Generic({
+      polygon: {
+        fill: {
+          color: 'green',
+          opacity: 0.5,
+        },
+        stroke: {
+          color: 'green',
+          width: 1
+        }
+      }
+    })
   }
 
   /**
@@ -47,7 +62,7 @@ export default class GeobusquedasControl extends M.Control {
         this.element = html;
         this.selectIndexOptions_ = response
         this.addEvents(html);
-        success(html);
+        success(html)
       })
     });
   }
@@ -105,16 +120,19 @@ export default class GeobusquedasControl extends M.Control {
     this.selectorIndicesEL = html.querySelectorAll('select#selectorIndices')[0];
     this.selectorCamposEL = html.querySelectorAll('select#selectorCampos')[0];
     this.selectorTextAreaEL = html.querySelectorAll('input#textArea')[0];
+    this.selectorEditorCodeMirrorEL = html.querySelectorAll('div#editorCodeMirror')[0];
     this.loadButtonEL = html.querySelectorAll('button#loadButton')[0];
     this.clearButtonEL = html.querySelectorAll('button#clearButton')[0];
     /* SE CREAN Y CONFIGURAR LOS CHOICE.JS*/
     this.choicesSelectorIndicesEL = new Choices(this.selectorIndicesEL, { allowHTML: true, placeholderValue: 'Seleccione un indice', placeholder: true, searchPlaceholderValue: 'Seleccione un indice', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true });
     this.choicesSelectorCamposEL = new Choices(this.selectorCamposEL, { allowHTML: true, placeholderValue: 'Seleccione un campo', placeholder: true, searchPlaceholderValue: 'Seleccione un campo', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true, removeItems: true, removeItemButton: true, });
-    // inicializao el choice a disable 
+    // INICIALIZAMOS EL CHOICE DE CAMPOS A DISABLE
     this.choicesSelectorCamposEL.disable();
-
-    
-
+    // CARGAMOS EDITOR CODEMIRROR
+    this.editor = new EditorView({
+      extensions: [basicSetup, json()],
+      parent: this.selectorEditorCodeMirrorEL
+    });
     /* SE CREAN LOS EVENTOS*/
     this.selectorIndicesEL.addEventListener('change', () => {
       let indice = this.choicesSelectorIndicesEL.getValue(true);
@@ -125,11 +143,10 @@ export default class GeobusquedasControl extends M.Control {
       this.clearButtonEL.disabled = false;
     })
     this.loadButtonEL.addEventListener('click', () => {
-      let indice = this.choicesSelectorIndicesEL.getValue(true);
-      let campo = this.choicesSelectorCamposEL.getValue(true);
-      this.search(indice, campo)
+      this.indice = this.choicesSelectorIndicesEL.getValue(true);
+      this.campo = this.choicesSelectorCamposEL.getValue(true);
+      this.search(this.indice, this.campo)
     })
-
     this.clearButtonEL.addEventListener('click', () => {
       this.choicesSelectorIndicesEL.destroy()
       this.choicesSelectorIndicesEL = new Choices(this.selectorIndicesEL, { allowHTML: true, placeholderValue: 'Seleccione un indice', placeholder: true, searchPlaceholderValue: 'Seleccione un indice', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true });
@@ -137,11 +154,21 @@ export default class GeobusquedasControl extends M.Control {
       this.choicesSelectorCamposEL.destroy()
       this.choicesSelectorCamposEL = new Choices(this.selectorCamposEL, { allowHTML: true, placeholderValue: 'Seleccione un campo', placeholder: true, searchPlaceholderValue: 'Seleccione un campo', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true, removeItems: true, removeItemButton: true, });
       this.choicesSelectorCamposEL.disable();
+      /* DESTRUIMOS EL EDITOR Y VOLVEMOS A CREARLO */
+      this.editor.destroy();
+      this.editor = new EditorView({
+        extensions: [basicSetup, json()],
+        parent: this.selectorEditorCodeMirrorEL
+      });
       this.loadButtonEL.disabled = true;
       this.clearButtonEL.disabled = true;
-    })    
-
-
+      let layerList = this.map_.getLayers()
+      layerList.forEach(layer => {
+        if (layer.name == this.indice) {
+          this.map_.removeLayers(layer)
+        }
+      });
+    })
   }
 
   getIndexs() {
@@ -195,8 +222,8 @@ export default class GeobusquedasControl extends M.Control {
   }
 
   search(index, fields) {
-    let request
-    if (this.selectorTextAreaEL.value==''){
+    let request;
+    if (this.editor.state.doc.toString() == '') {
       request = {
         "query": {
           "match_all": {},
@@ -207,15 +234,15 @@ export default class GeobusquedasControl extends M.Control {
         "size": this.MAX_QUERY_SIZE,
         // "size": 100,
       }
-    } else{
-      request = JSON.parse(this.selectorTextAreaEL.value)
+    } else {
+      request = JSON.parse(this.editor.state.doc.toString())
     }
 
     let capaGeoJSON
     M.proxy(false);
     fields.push("geom")
     let url = this.config_.url + '/' + index + '/search?'
-      
+
     M.remote.post(url, request).then((res) => {
       let layerList = this.map_.getLayers()
       layerList.forEach(layer => {
@@ -255,7 +282,12 @@ export default class GeobusquedasControl extends M.Control {
         name: index
       });
 
+      capaGeoJSON.setStyle(this.estilo);
+
       this.map_.addLayers(capaGeoJSON);
+      capaGeoJSON.on(M.evt.LOAD, () => {
+        this.map_.setBbox(capaGeoJSON.getMaxExtent())
+      })
     })
   }
 }
