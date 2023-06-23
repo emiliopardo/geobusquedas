@@ -30,12 +30,13 @@ const map = M.map({
   // projection: "EPSG:4326*d",
 });
 
+map.setBGColorContainer('white');
 map.addControls(['scale','scaleline','mouse','panzoombar', 'layerswitcher']);
 
 
 var configuracion = {
   config:{
-    title: 'Test',
+    title: 'Test Elasticsearch',
     url: 'http://localhost/geobusquedas'
   },
   options:{
