@@ -4,7 +4,8 @@
  * @module M/control/GeobusquedasControl
  */
 import Choices from 'choices.js';
-import { EditorView, basicSetup } from "codemirror"
+import { EditorView, placeholder } from '@codemirror/view'
+// import { EditorView, basicSetup, placeholder } from "codemirror"
 import { json } from "@codemirror/lang-json"
 import GeobusquedasImplControl from 'impl/geobusquedascontrol';
 import template from 'templates/geobusquedas';
@@ -130,7 +131,8 @@ export default class GeobusquedasControl extends M.Control {
     this.choicesSelectorCamposEL.disable();
     // CARGAMOS EDITOR CODEMIRROR
     this.editor = new EditorView({
-      extensions: [basicSetup, json()],
+      //extensions: [basicSetup, json(),placeholder('placeholder text')],
+      extensions: [json(),placeholder('placeholder text')],
       parent: this.selectorEditorCodeMirrorEL
     });
     /* SE CREAN LOS EVENTOS*/
@@ -157,7 +159,8 @@ export default class GeobusquedasControl extends M.Control {
       /* DESTRUIMOS EL EDITOR Y VOLVEMOS A CREARLO */
       this.editor.destroy();
       this.editor = new EditorView({
-        extensions: [basicSetup, json()],
+        // extensions: [basicSetup, json(),placeholder('placeholder text')],
+        extensions: [json(),placeholder('placeholder text')],
         parent: this.selectorEditorCodeMirrorEL
       });
       this.loadButtonEL.disabled = true;
