@@ -3,10 +3,14 @@
 /**
  * @module M/control/GeobusquedasControl
  */
-import Choices from 'choices.js';
-import { EditorView, placeholder } from '@codemirror/view'
-// import { EditorView, basicSetup, placeholder } from "codemirror"
+
+import {EditorState} from "@codemirror/state"
+import {EditorView, keymap, placeholder,lineNumbers, drawSelection,highlightActiveLine,highlightActiveLineGutter,highlightSpecialChars} from "@codemirror/view"
+import {defaultHighlightStyle, syntaxHighlighting, indentOnInput, bracketMatching,foldGutter, foldKeymap} from "@codemirror/language"
+import {autocompletion, completionKeymap, closeBrackets, closeBracketsKeymap} from "@codemirror/autocomplete"
+import {defaultKeymap} from "@codemirror/commands"
 import { json } from "@codemirror/lang-json"
+import Choices from 'choices.js';
 import GeobusquedasImplControl from 'impl/geobusquedascontrol';
 import template from 'templates/geobusquedas';
 
@@ -29,7 +33,33 @@ export default class GeobusquedasControl extends M.Control {
     const impl = new GeobusquedasImplControl();
     super(impl, 'Geobusquedas');
     this.config_ = config;
+    //Número maximo de documentos devueltos por elastic
     this.MAX_QUERY_SIZE = 10000;
+
+    //Configuracion de CodeMirror
+    this.startState_ = EditorState.create({
+      doc: "",
+      extensions: [
+        lineNumbers(),
+        highlightActiveLineGutter(),
+        highlightSpecialChars(),
+        foldGutter(),
+        drawSelection(),
+        json(), 
+        indentOnInput(),
+        syntaxHighlighting(defaultHighlightStyle, {fallback: true}),
+        bracketMatching(),
+        closeBrackets(),
+        autocompletion(),       
+        highlightActiveLine(),
+        placeholder('Editor JSON'),
+        keymap.of([
+          closeBracketsKeymap,
+          defaultKeymap,
+          foldKeymap,
+          completionKeymap
+        ])]
+    })
 
     this.estilo = new M.style.Generic({
       polygon: {
@@ -131,10 +161,10 @@ export default class GeobusquedasControl extends M.Control {
     this.choicesSelectorCamposEL.disable();
     // CARGAMOS EDITOR CODEMIRROR
     this.editor = new EditorView({
-      //extensions: [basicSetup, json(),placeholder('placeholder text')],
-      extensions: [json(),placeholder('placeholder text')],
-      parent: this.selectorEditorCodeMirrorEL
-    });
+      state: this.startState_,
+      parent: this.selectorEditorCodeMirrorEL,
+    })
+
     /* SE CREAN LOS EVENTOS*/
     this.selectorIndicesEL.addEventListener('change', () => {
       let indice = this.choicesSelectorIndicesEL.getValue(true);
@@ -156,13 +186,9 @@ export default class GeobusquedasControl extends M.Control {
       this.choicesSelectorCamposEL.destroy()
       this.choicesSelectorCamposEL = new Choices(this.selectorCamposEL, { allowHTML: true, placeholderValue: 'Seleccione un campo', placeholder: true, searchPlaceholderValue: 'Seleccione un campo', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true, removeItems: true, removeItemButton: true, });
       this.choicesSelectorCamposEL.disable();
-      /* DESTRUIMOS EL EDITOR Y VOLVEMOS A CREARLO */
-      this.editor.destroy();
-      this.editor = new EditorView({
-        // extensions: [basicSetup, json(),placeholder('placeholder text')],
-        extensions: [json(),placeholder('placeholder text')],
-        parent: this.selectorEditorCodeMirrorEL
-      });
+      /* RESETEAMOS LOS VALORES DEL EDITOR */
+      this.editor.setState(this.startState_);
+
       this.loadButtonEL.disabled = true;
       this.clearButtonEL.disabled = true;
       let layerList = this.map_.getLayers()
