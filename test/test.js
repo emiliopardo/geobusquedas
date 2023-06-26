@@ -13,7 +13,7 @@ M.addProxyException("http://localhost");
 // })
 
 const ortofoto2016_pancromatica = new M.layer.WMS({
-  url: 'http://www.ideandalucia.es/wms/ortofoto2016?',
+  url: 'https://www.ideandalucia.es/wms/ortofoto2016?',
   name: 'ortofotografia_2016_pancromatico',
   legend: 'Ortofotografía Pancromática 0,5 metros/pixel (Año 2016)',
   transparent: false,
