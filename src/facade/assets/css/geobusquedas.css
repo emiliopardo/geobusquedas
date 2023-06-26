@@ -161,14 +161,28 @@ div.opciones-busqueda {
   font-size: 0.8em;
   display: block;
 }
+.label-filters{
+  background-color: #eaeaea;
+  line-height: 20px;
+  font-size: 11px;
+  display: block;
+}
+
+#filter-container{
+  display: none;
+  height: 200px;
+  background-color: red;
+  border: 1px solid #eaeaea;
+  border-bottom-left-radius: 2.5px;
+  border-bottom-right-radius: 2.5px;
+}
+
 
 label {
   display: block;
   margin: 0 0 -1px;
   padding: 5px;
   font-weight: 600;
-  text-align: center;
-  color: #bbb;
   background-color: #fff;
 }
 
