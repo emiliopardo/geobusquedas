@@ -4,11 +4,11 @@
  * @module M/control/GeobusquedasControl
  */
 
-import {EditorState} from "@codemirror/state"
-import {EditorView, keymap, placeholder,lineNumbers, drawSelection,highlightActiveLine,highlightActiveLineGutter,highlightSpecialChars} from "@codemirror/view"
-import {defaultHighlightStyle, syntaxHighlighting, indentOnInput, bracketMatching,foldGutter, foldKeymap} from "@codemirror/language"
-import {autocompletion, completionKeymap, closeBrackets, closeBracketsKeymap} from "@codemirror/autocomplete"
-import {defaultKeymap} from "@codemirror/commands"
+import { EditorState } from "@codemirror/state"
+import { EditorView, keymap, placeholder, lineNumbers, drawSelection, highlightActiveLine, highlightActiveLineGutter, highlightSpecialChars } from "@codemirror/view"
+import { defaultHighlightStyle, syntaxHighlighting, indentOnInput, bracketMatching, foldGutter, foldKeymap } from "@codemirror/language"
+import { autocompletion, completionKeymap, closeBrackets, closeBracketsKeymap } from "@codemirror/autocomplete"
+import { defaultKeymap } from "@codemirror/commands"
 import { json } from "@codemirror/lang-json"
 import Choices from 'choices.js';
 import GeobusquedasImplControl from 'impl/geobusquedascontrol';
@@ -32,27 +32,29 @@ export default class GeobusquedasControl extends M.Control {
     // 2. implementation of this control
     const impl = new GeobusquedasImplControl();
     super(impl, 'Geobusquedas');
+    this.IndexsListoptions = new Array();
     this.config_ = config;
+    this.activePanel = 1;
     //Número maximo de documentos devueltos por elastic
     this.MAX_QUERY_SIZE = 10000;
 
     //Configuracion de CodeMirror
     this.startState_ = EditorState.create({
-      doc: "",
+      doc: "{}",
       extensions: [
         lineNumbers(),
         highlightActiveLineGutter(),
         highlightSpecialChars(),
         foldGutter(),
         drawSelection(),
-        json(), 
+        json(),
         indentOnInput(),
-        syntaxHighlighting(defaultHighlightStyle, {fallback: true}),
+        syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
         bracketMatching(),
         closeBrackets(),
-        autocompletion(),       
+        autocompletion(),
         highlightActiveLine(),
-        placeholder('Editor JSON'),
+        placeholder('{}'),
         keymap.of([
           closeBracketsKeymap,
           defaultKeymap,
@@ -84,17 +86,14 @@ export default class GeobusquedasControl extends M.Control {
    * @api stable
    */
   createView(map) {
-    this.templateVars_ = { vars: { title: this.config_.title } };
-    return new Promise((success, fail) => {
-      // hasta que no optenga la respuesta de los indices no cargo la plantilla ni los eventos
-      this.getIndexs().then((response) => {
+    return new Promise((success) => {
+      this.getIndexs().then(() => {
+        this.templateVars_ = { vars: { title: this.config_.title } };
         const html = M.template.compileSync(template, this.templateVars_);
-        // Añadir código dependiente del DOM
         this.element = html;
-        this.selectIndexOptions_ = response
         this.addEvents(html);
         success(html)
-      })
+      });
     });
   }
 
@@ -148,47 +147,78 @@ export default class GeobusquedasControl extends M.Control {
 
   addEvents(html) {
     /* SE ACCEDE A LOS SELECTORES */
-    this.selectorIndicesEL = html.querySelectorAll('select#selectorIndices')[0];
-    this.selectorCamposEL = html.querySelectorAll('select#selectorCampos')[0];
-    this.selectorTextAreaEL = html.querySelectorAll('input#textArea')[0];
-    this.selectorEditorCodeMirrorEL = html.querySelectorAll('div#editorCodeMirror')[0];
+    this.panelTab1El = html.querySelectorAll('#tab1')[0];
+    this.panelTab2El = html.querySelectorAll('#tab2')[0];
+    this.panelContentTab1EL = html.querySelectorAll('#content-tab1')[0];
+    this.panelContentTab2EL = html.querySelectorAll('#content-tab2')[0];
+    this.selectorIndicesTab1EL = html.querySelectorAll('select#selectorIndices-tab1')[0];
+    this.selectorIndicesTab2EL = html.querySelectorAll('select#selectorIndices-tab2')[0];
+    this.selectorCamposTab1EL = html.querySelectorAll('select#selectorCampos')[0];
+    this.selectorEditorCodeMirrorTab2EL = html.querySelectorAll('div#editorCodeMirror')[0];
     this.loadButtonEL = html.querySelectorAll('button#loadButton')[0];
     this.clearButtonEL = html.querySelectorAll('button#clearButton')[0];
     /* SE CREAN Y CONFIGURAR LOS CHOICE.JS*/
-    this.choicesSelectorIndicesEL = new Choices(this.selectorIndicesEL, { allowHTML: true, placeholderValue: 'Seleccione un indice', placeholder: true, searchPlaceholderValue: 'Seleccione un indice', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true });
-    this.choicesSelectorCamposEL = new Choices(this.selectorCamposEL, { allowHTML: true, placeholderValue: 'Seleccione un campo', placeholder: true, searchPlaceholderValue: 'Seleccione un campo', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true, removeItems: true, removeItemButton: true, });
-    // INICIALIZAMOS EL CHOICE DE CAMPOS A DISABLE
-    this.choicesSelectorCamposEL.disable();
-    // CARGAMOS EDITOR CODEMIRROR
+    this.choicesSelectorIndicesTab1EL = new Choices(this.selectorIndicesTab1EL, { allowHTML: true, placeholderValue: 'Seleccione un indice', placeholder: true, searchPlaceholderValue: 'Seleccione un indice', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true });
+    this.choicesSelectorCamposTab1EL = new Choices(this.selectorCamposTab1EL, { allowHTML: true, placeholderValue: 'Seleccione un campo', placeholder: true, searchPlaceholderValue: 'Seleccione un campo', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true, removeItems: true, removeItemButton: true, });
+    this.choicesSelectorIndicesTab2EL = new Choices(this.selectorIndicesTab2EL, { allowHTML: true, placeholderValue: 'Seleccione un indice', placeholder: true, searchPlaceholderValue: 'Seleccione un indice', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true });
+
+    /* INICIALIZAMOS EL CHOICE DE CAMPOS A DISABLE */
+    this.choicesSelectorCamposTab1EL.disable();
+    /* CARGAMOS EDITOR CODEMIRROR  */
     this.editor = new EditorView({
       state: this.startState_,
-      parent: this.selectorEditorCodeMirrorEL,
+      parent: this.selectorEditorCodeMirrorTab2EL,
+    })
+    /* SE CREAN LOS EVENTOS */
+    this.panelTab1El.addEventListener('click', () => {
+      this.activePanel = 1;
+      this.panelTab1El.classList.add('actived');
+      this.panelTab2El.classList.remove('actived');
+      this.panelContentTab2EL.style.display = 'none';
+      this.panelContentTab1EL.style.display = 'block';
+    })
+    this.panelTab2El.addEventListener('click', () => {
+      this.activePanel = 2;
+      this.panelTab2El.classList.add('actived');
+      this.panelTab1El.classList.remove('actived');
+      this.panelContentTab1EL.style.display = 'none';
+      this.panelContentTab2EL.style.display = 'block';
     })
 
-    /* SE CREAN LOS EVENTOS*/
-    this.selectorIndicesEL.addEventListener('change', () => {
-      let indice = this.choicesSelectorIndicesEL.getValue(true);
+    this.selectorIndicesTab1EL.addEventListener('change', () => {
+      let indice = this.choicesSelectorIndicesTab1EL.getValue(true);
       this.getFields(indice);
     })
-    this.selectorCamposEL.addEventListener('change', () => {
+    this.selectorCamposTab1EL.addEventListener('change', () => {
       this.loadButtonEL.disabled = false;
       this.clearButtonEL.disabled = false;
     })
+
+    this.selectorIndicesTab2EL.addEventListener('change', () => {
+      this.loadButtonEL.disabled = false;
+      this.clearButtonEL.disabled = false;
+    });
     this.loadButtonEL.addEventListener('click', () => {
-      this.indice = this.choicesSelectorIndicesEL.getValue(true);
-      this.campo = this.choicesSelectorCamposEL.getValue(true);
-      this.search(this.indice, this.campo)
+      this.search();
     })
     this.clearButtonEL.addEventListener('click', () => {
-      this.choicesSelectorIndicesEL.destroy()
-      this.choicesSelectorIndicesEL = new Choices(this.selectorIndicesEL, { allowHTML: true, placeholderValue: 'Seleccione un indice', placeholder: true, searchPlaceholderValue: 'Seleccione un indice', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true });
-      this.getIndexs()
-      this.choicesSelectorCamposEL.destroy()
-      this.choicesSelectorCamposEL = new Choices(this.selectorCamposEL, { allowHTML: true, placeholderValue: 'Seleccione un campo', placeholder: true, searchPlaceholderValue: 'Seleccione un campo', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true, removeItems: true, removeItemButton: true, });
-      this.choicesSelectorCamposEL.disable();
-      /* RESETEAMOS LOS VALORES DEL EDITOR */
-      this.editor.setState(this.startState_);
-
+      switch (this.activePanel) {
+        case 1:
+          this.choicesSelectorIndicesTab1EL.destroy();
+          this.choicesSelectorCamposTab1EL.destroy();
+          this.choicesSelectorIndicesTab1EL = new Choices(this.selectorIndicesTab1EL, { allowHTML: true, placeholderValue: 'Seleccione un indice', placeholder: true, searchPlaceholderValue: 'Seleccione un indice', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true });
+          this.choicesSelectorIndicesTab1EL.setChoices(this.IndexsListoptions)
+          this.choicesSelectorCamposTab1EL = new Choices(this.selectorCamposTab1EL, { allowHTML: true, placeholderValue: 'Seleccione un campo', placeholder: true, searchPlaceholderValue: 'Seleccione un campo', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true, removeItems: true, removeItemButton: true, });
+          this.choicesSelectorCamposTab1EL.disable();
+          break
+        case 2:
+          this.choicesSelectorIndicesTab2EL.destroy();
+          this.choicesSelectorIndicesTab2EL = new Choices(this.selectorIndicesTab2EL, { allowHTML: true, placeholderValue: 'Seleccione un indice', placeholder: true, searchPlaceholderValue: 'Seleccione un indice', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true });
+          this.choicesSelectorIndicesTab2EL.setChoices(this.IndexsListoptions)
+          /* RESETEAMOS LOS VALORES DEL EDITOR */
+          this.editor.setState(this.startState_);
+          break
+      }
       this.loadButtonEL.disabled = true;
       this.clearButtonEL.disabled = true;
       let layerList = this.map_.getLayers()
@@ -201,7 +231,13 @@ export default class GeobusquedasControl extends M.Control {
   }
 
   getIndexs() {
-    let options = new Array()
+    let my_option = {
+      value: '',
+      label: 'Selecciona un indice',
+      selected: true,
+      disabled: true,
+    }
+    this.IndexsListoptions.push(my_option)
     M.remote.get(this.config_.url + '/indices?format=json').then((response) => {
       let responseIndexList = JSON.parse(response.text);
       responseIndexList.forEach(element => {
@@ -213,15 +249,15 @@ export default class GeobusquedasControl extends M.Control {
             selected: false,
             disabled: false,
           }
-
-          options.push(my_option);
+          this.IndexsListoptions.push(my_option)
         }
       });
-      //defino el listado de opciones del choice
-      this.choicesSelectorIndicesEL.setChoices(options)
+
+      this.choicesSelectorIndicesTab1EL.setChoices(this.IndexsListoptions)
+      this.choicesSelectorIndicesTab2EL.setChoices(this.IndexsListoptions)
     })
-    return new Promise((success, fail) => {
-      success(options)
+    return new Promise((success) => {
+      success()
     })
   }
 
@@ -244,38 +280,47 @@ export default class GeobusquedasControl extends M.Control {
         }
       })
       //reseteo el choice y defino el listado de opciones del choice
-      this.choicesSelectorCamposEL.setChoices(options, 'value', 'label', true);
+      this.choicesSelectorCamposTab1EL.setChoices(options, 'value', 'label', true);
       //activo el choice
-      this.choicesSelectorCamposEL.enable();
+      this.choicesSelectorCamposTab1EL.enable();
     })
   }
 
-  search(index, fields) {
+  search() {
     let request;
-    if (this.editor.state.doc.toString() == '') {
-      request = {
-        "query": {
-          "match_all": {},
-        },
-        "_source": {
-          "includes": fields,
-        },
-        "size": this.MAX_QUERY_SIZE,
-        // "size": 100,
-      }
-    } else {
-      request = JSON.parse(this.editor.state.doc.toString())
-    }
+    let indice
+    let campos
 
+    switch (this.activePanel) {
+      case 1:
+        indice = this.choicesSelectorIndicesTab1EL.getValue(true);
+        campos = this.choicesSelectorCamposTab1EL.getValue(true);
+        request = {
+          "query": {
+            "match_all": {},
+          },
+          "_source": {
+            "includes": campos,
+          },
+          "size": this.MAX_QUERY_SIZE,
+          // "size": 100,
+        }
+        break;
+      case 2:
+        indice = this.choicesSelectorIndicesTab2EL.getValue(true);
+        request = JSON.parse(this.editor.state.doc.toString())
+        campos = new Array();
+        break;
+    }
     let capaGeoJSON
     M.proxy(false);
-    fields.push("geom")
-    let url = this.config_.url + '/' + index + '/search?'
+    campos.push("geom")
+    let url = this.config_.url + '/' + indice + '/search?'
 
     M.remote.post(url, request).then((res) => {
       let layerList = this.map_.getLayers()
       layerList.forEach(layer => {
-        if (layer.name == index) {
+        if (layer.name == indice) {
           this.map_.removeLayers(layer)
         }
       });
@@ -308,7 +353,7 @@ export default class GeobusquedasControl extends M.Control {
           "features": Arrayfeatures,
           "type": "FeatureCollection"
         },
-        name: index
+        name: indice
       });
 
       capaGeoJSON.setStyle(this.estilo);
