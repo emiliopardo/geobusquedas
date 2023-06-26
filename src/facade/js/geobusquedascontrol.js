@@ -157,6 +157,8 @@ export default class GeobusquedasControl extends M.Control {
     this.selectorEditorCodeMirrorTab2EL = html.querySelectorAll('div#editorCodeMirror')[0];
     this.loadButtonEL = html.querySelectorAll('button#loadButton')[0];
     this.clearButtonEL = html.querySelectorAll('button#clearButton')[0];
+    this.filterFieldsEL = html.querySelectorAll('label#label-filters')[0];
+    this.filtersContainerEL = html.querySelectorAll('div#filter-container')[0];
     /* SE CREAN Y CONFIGURAR LOS CHOICE.JS*/
     this.choicesSelectorIndicesTab1EL = new Choices(this.selectorIndicesTab1EL, { allowHTML: true, placeholderValue: 'Seleccione un indice', placeholder: true, searchPlaceholderValue: 'Seleccione un indice', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true });
     this.choicesSelectorCamposTab1EL = new Choices(this.selectorCamposTab1EL, { allowHTML: true, placeholderValue: 'Seleccione un campo', placeholder: true, searchPlaceholderValue: 'Seleccione un campo', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true, removeItems: true, removeItemButton: true, });
@@ -192,6 +194,17 @@ export default class GeobusquedasControl extends M.Control {
     this.selectorCamposTab1EL.addEventListener('change', () => {
       this.loadButtonEL.disabled = false;
       this.clearButtonEL.disabled = false;
+    })
+
+    this.filterFieldsEL.addEventListener('click', () => {
+      let myIcon = this.filterFieldsEL.firstChild
+      myIcon.classList.toggle('g-cartografia-mas2')
+      myIcon.classList.toggle('g-cartografia-menos2')
+      if (myIcon.classList.contains('g-cartografia-menos2')) {
+        this.filtersContainerEL.style.display = 'block'
+      } else {
+        this.filtersContainerEL.style.display = 'none'
+      }
     })
 
     this.selectorIndicesTab2EL.addEventListener('change', () => {
