@@ -5,20 +5,33 @@
     <!-- BODY-->
     <div class="m-geobusquedas-body">
       <div id="m-geobusquedas-content">
-        <div id="indices" class="opciones-busqueda">
-          <label class="label-opciones-busqueda" for="selectorIndices">Indices</label>
-          <select id="selectorIndices" name="selectorIndices" default-label="Indices">
-          </select>
+        <div id="m-geobusquedas-tab">
+          <label id="tab1" class="m-geobusquedas-tab actived">Básico</label>
+          <label id="tab2" class="m-geobusquedas-tab">Avanzado</label>
         </div>
-        <div id="campos" class="opciones-busqueda">
-          <label class="label-opciones-busqueda" for="selectorCampos">Campos</label>
-          <select id="selectorCampos" name="selectorCampos" default-label="Campos" multiple>
-          </select>
+        <div id="content-tab1">
+          <div id="indices" class="opciones-busqueda">
+            <label class="label-opciones-busqueda" for="selectorIndices-tab1">Indices</label>
+            <select id="selectorIndices-tab1" name="selectorIndices-tab1" default-label="Indices">
+            </select>
+          </div>
+          <div id="campos" class="opciones-busqueda">
+            <label class="label-opciones-busqueda" for="selectorCampos">Campos</label>
+            <select id="selectorCampos" name="selectorCampos" default-label="Campos" multiple>
+            </select>
+          </div>
         </div>
-        <div id="editor" class="opciones-busqueda">
-          <label class="label-opciones-busqueda" for="editorCodeMirror">JSON</label>
-        <div id="editorCodeMirror"></div>
-      </div>
+        <div id="content-tab2">
+          <div id="indices" class="opciones-busqueda">
+            <label class="label-opciones-busqueda" for="selectorIndices-tab2">Indices</label>
+            <select id="selectorIndices-tab2" name="selectorIndices-tab2" default-label="Indices">
+            </select>
+          </div>
+          <div id="editor" class="opciones-busqueda">
+            <label class="label-opciones-busqueda" for="editorCodeMirror">Editor JSON</label>
+            <div id="editorCodeMirror"></div>
+          </div>
+        </div>
       </div>
       <div id="m-geobusquedas-result-content" class="results">
       </div>

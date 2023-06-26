@@ -98,6 +98,38 @@ div.m-geobusquedas-title {
   color: #fff;
 }
 
+/* Estilo labels tab */
+label.m-geobusquedas-tab {
+  display: inline-block;
+  margin: 0 0 -1px;
+  padding: 10px;
+  font-weight: 600;
+  text-align: center;
+  color: #bbb;
+  border: 1px solid transparent;
+}
+
+label.m-geobusquedas-tab:hover {
+  cursor: pointer;
+}
+
+label.actived {
+  color: #555;
+  border: 1px solid #ddd;
+  border-top: 2px solid #ff9800;
+  border-bottom: 1px solid #fff;
+}
+
+/* Estilo contendores-tab*/
+#content-tab1 {
+  display: block;
+}
+
+#content-tab2 {
+  display: none;
+}
+
+
 input#textArea {
   width: 23vw;
   height: 50px
