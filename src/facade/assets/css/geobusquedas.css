@@ -161,14 +161,15 @@ div.opciones-busqueda {
   font-size: 0.8em;
   display: block;
 }
-.label-filters{
+
+.label-filters {
   background-color: #eaeaea;
   line-height: 20px;
   font-size: 11px;
   display: block;
 }
 
-#filter-container{
+#filter-container {
   display: none;
   height: auto;
   background-color: transparent;
@@ -246,4 +247,15 @@ div#m-geobusquedas-buttons>button:disabled {
 
 .cm-scroller {
   overflow: auto
+}
+
+input.inputFilters {
+  width: 96% !important;
+  height: 20px;
+  font-size: 10px !important;
+  vertical-align: top!important;
+  background-color: #f9f9f9!important;
+  padding: 7.5px 7.5px 3.75px!important;
+  border: 1px solid #ddd!important;
+  border-radius: 2.5px!important;
 }
