@@ -466,7 +466,7 @@ export default class GeobusquedasControl extends M.Control {
     }
     if (my_select) {
       my_div.appendChild(my_select);
-      this.getAggregationsField(field,my_select)
+      this.getDistinctValuesinField(field,my_select)
     }
     this.filtersOptionsEL.appendChild(my_div)
   }
@@ -477,7 +477,7 @@ export default class GeobusquedasControl extends M.Control {
     }
   }
 
-  getAggregationsField(my_field,my_select) {
+  getDistinctValuesinField(my_field,my_select) {
     let indice = this.choicesSelectorIndicesTab1EL.getValue(true);
     let request = {
       "size": 0,
@@ -514,5 +514,13 @@ export default class GeobusquedasControl extends M.Control {
         console.log(choiceSelectEL.getValue(true));
       })
     })
+  }
+
+  getBasictStatsFields(my_field,my_input){
+    console.log(my_field,my_input)
+  }
+
+  getAdvancedtStatsFields(my_field,my_input){
+    console.log(my_field,my_input)
   }
 }
