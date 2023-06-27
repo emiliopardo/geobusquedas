@@ -160,6 +160,7 @@ export default class GeobusquedasControl extends M.Control {
     this.clearButtonEL = html.querySelectorAll('button#clearButton')[0];
     this.filterFieldsEL = html.querySelectorAll('label#label-filters')[0];
     this.filtersContainerEL = html.querySelectorAll('div#filter-container')[0];
+    this.filtersOptionsEL = html.querySelectorAll('div#filters-options')[0];
     /* SE CREAN Y CONFIGURAR LOS CHOICE.JS*/
     this.choicesSelectorIndicesTab1EL = new Choices(this.selectorIndicesTab1EL, { allowHTML: true, placeholderValue: 'Seleccione un indice', placeholder: true, searchPlaceholderValue: 'Seleccione un indice', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true });
     this.choicesSelectorCamposTab1EL = new Choices(this.selectorCamposTab1EL, { allowHTML: true, placeholderValue: 'Seleccione un campo', placeholder: true, searchPlaceholderValue: 'Seleccione un campo', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true, removeItems: true, removeItemButton: true, });
@@ -197,6 +198,11 @@ export default class GeobusquedasControl extends M.Control {
     this.selectorCamposTab1EL.addEventListener('change', () => {
       this.loadButtonEL.disabled = false;
       this.clearButtonEL.disabled = false;
+    })
+
+    this.selectorCamposFiltrosTab1EL.addEventListener('change', () => {
+      this.removeAllChildNodes(this.filtersOptionsEL);
+      this.createFilters(this.choicesSelectorCamposFiltrosTab1EL.getValue(true));
     })
 
     this.filterFieldsEL.addEventListener('click', () => {
@@ -286,7 +292,7 @@ export default class GeobusquedasControl extends M.Control {
       let fieldsObject = indexInfo[index]['mappings']['properties'];
       let fieldsArray = Object.keys(fieldsObject);
       let options = new Array();
-      let fieldsFilters = new Array();
+      this.fieldsFilters = new Array();
 
       fieldsArray.forEach(field => {
         if (field != 'geom') {
@@ -296,7 +302,7 @@ export default class GeobusquedasControl extends M.Control {
             type: fieldsObject[field]['type']
           }
 
-          fieldsFilters.push(filter)
+          this.fieldsFilters.push(filter)
 
           let option = {
             value: field,
@@ -307,13 +313,12 @@ export default class GeobusquedasControl extends M.Control {
           options.push(option);
         }
       })
-      //reseteo el choice y defino el listado de opciones del choice
+      //reseteo los cohices de los campos
       this.choicesSelectorCamposTab1EL.setChoices(options, 'value', 'label', true);
       this.choicesSelectorCamposFiltrosTab1EL.setChoices(options, 'value', 'label', true);
-      //activo el choice
+      //activo los choices de los campos 
       this.choicesSelectorCamposTab1EL.enable();
       this.choicesSelectorCamposFiltrosTab1EL.enable();
-      // this.createFiltersDOMElement(fieldsFilters)
     })
   }
 
@@ -396,55 +401,118 @@ export default class GeobusquedasControl extends M.Control {
     })
   }
 
-  createFiltersDOMElement(fieldsFilters) {
-    //   <div id="campos" class="opciones-busqueda">
-    //   <label class="label-opciones-busqueda" for="selectorCampos">Campos</label>
-    //   <select id="selectorCampos" name="selectorCampos" default-label="Campos" multiple>
-    //   </select>
-    // </div>
-    fieldsFilters.forEach(element => {
-      // construimos elemento div
-      let my_div = document.createElement('div');
-      my_div.setAttribute('id', element['field']);
-      my_div.setAttribute('name', element['field']);
-      my_div.setAttribute('class', 'opciones-busqueda');
-      // construimos elemento label
-      let my_label = document.createElement("label");
-      my_label.setAttribute('class', 'label-opciones-busqueda');
-      my_label.setAttribute('for', 'filtro_' + element['field']);
-      my_label.innerHTML = element['field'];
-      let my_input = document.createElement('input');
-      if (element.type == 'long') {
-        my_input.setAttribute('id', 'filtro_' + element['field']);
-        my_input.setAttribute('name', 'filtro_' + element['field']);
-        my_input.setAttribute('type','number');
-        my_input.setAttribute('class', 'inputFilters');
-      } else if (element.type == 'double') {
-        let my_input = document.createElement('input');
-        my_input.setAttribute('id', 'filtro_' + element['field']);
-        my_input.setAttribute('name', 'filtro_' + element['field']);
-        my_input.setAttribute('type','number');
-        my_input.setAttribute('class', 'inputFilters');
-      } else if (element.type == 'text') {
-        my_input.setAttribute('id', 'filtro_' + element['field']);
-        my_input.setAttribute('name', 'filtro_' + element['field']);
-        my_input.setAttribute('type','text');
-        my_input.setAttribute('class', 'inputFilters');
-      } else if (element.type == 'keyword') {
-        my_input.setAttribute('id', 'filtro_' + element['field']);
-        my_input.setAttribute('name', 'filtro_' + element['field']);
-        my_input.setAttribute('type','text');
-        my_input.setAttribute('class', 'inputFilters');
-      }
-
-      my_div.appendChild(my_label);
-      my_div.appendChild(my_input);
-
-
-
-
-      this.filtersContainerEL.appendChild(my_div)
-
+  createFilters(arrayFields) {
+    arrayFields.forEach(field => {
+      let find = false;
+      do {
+        this.fieldsFilters.forEach(element => {
+          if (element['field'] == field) {
+            find = true;
+            this.createFiltersDOMElement(element['field'], element['type']);
+            find = true;
+          }
+        });
+      } while (!find);
     });
+  }
+
+  createFiltersDOMElement(field, type) {
+    // construimos elemento div
+    let my_div = document.createElement('div');
+    my_div.setAttribute('id', field);
+    my_div.setAttribute('name', field);
+    my_div.setAttribute('class', 'opciones-busqueda');
+    // construimos elemento label
+    let my_label = document.createElement("label");
+    my_label.setAttribute('class', 'label-opciones-busqueda');
+    my_label.setAttribute('for', 'filtro_' + field);
+    my_label.innerHTML = field;
+    let my_input;
+    let my_select;
+    switch (type) {
+      case 'long':
+        my_input = document.createElement('input');
+        my_input.setAttribute('id', 'filtro_' + field);
+        my_input.setAttribute('name', 'filtro_' + field);
+        my_input.setAttribute('type', 'number');
+        my_input.setAttribute('class', 'inputFilters');
+        break;
+      case 'double':
+        my_input = document.createElement('input');
+        my_input.setAttribute('id', 'filtro_' + field);
+        my_input.setAttribute('name', 'filtro_' + field);
+        my_input.setAttribute('type', 'number');
+        my_input.setAttribute('class', 'inputFilters');
+        break;
+      case 'keyword':
+        my_select = document.createElement('select');
+        my_select.setAttribute('id', 'filtro_' + field);
+        my_select.setAttribute('name', 'filtro_' + field);
+        my_select.setAttribute('multiple', true);
+        break;
+      case 'text':
+        my_input = document.createElement('input');
+        my_input.setAttribute('id', 'filtro_' + field);
+        my_input.setAttribute('name', 'filtro_' + field);
+        my_input.setAttribute('type', 'text');
+        my_input.setAttribute('class', 'inputFilters');
+        break;
+      default:
+        break;
+    }
+    my_div.appendChild(my_label);
+    if (my_input) {
+      my_div.appendChild(my_input);
+    }
+    if (my_select) {
+      my_div.appendChild(my_select);
+      this.getAggregationsField(field,my_select)
+    }
+    this.filtersOptionsEL.appendChild(my_div)
+  }
+
+  removeAllChildNodes(parent) {
+    while (parent.firstChild) {
+      parent.removeChild(parent.firstChild);
+    }
+  }
+
+  getAggregationsField(my_field,my_select) {
+    let indice = this.choicesSelectorIndicesTab1EL.getValue(true);
+    let request = {
+      "size": 0,
+      "aggs": {
+        "my-agg-name": {
+          "terms": {
+            "field": my_field,
+            "order": { "_key": "asc" },
+            "size": 10000
+          }
+        }
+      }
+    }
+
+    let my_options = new Array();
+    let url = this.config_.url + '/' + indice + '/search?'
+    M.proxy(false);
+    M.remote.post(url, request).then((res) => {
+      
+      let response = JSON.parse(res.text);
+      let buckets = response['aggregations']['my-agg-name']['buckets'];
+
+      buckets.forEach(bucket => {
+        my_options.push({
+          value: bucket['key'],
+          label: bucket['key'],
+          selected: false,
+          disabled: false
+        });
+      });
+
+      let choiceSelectEL = new Choices(my_select, { allowHTML: true, choices: my_options, placeholderValue: 'Seleccione un valor', placeholder: true, searchPlaceholderValue: 'Seleccione un valor', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true, removeItems: true, removeItemButton: true, });
+      my_select.addEventListener('change',()=>{
+        console.log(choiceSelectEL.getValue(true));
+      })
+    })
   }
 }
