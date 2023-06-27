@@ -170,8 +170,8 @@ div.opciones-busqueda {
 
 #filter-container{
   display: none;
-  height: 200px;
-  background-color: red;
+  height: auto;
+  background-color: transparent;
   border: 1px solid #eaeaea;
   border-bottom-left-radius: 2.5px;
   border-bottom-right-radius: 2.5px;
