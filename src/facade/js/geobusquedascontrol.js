@@ -160,7 +160,7 @@ export default class GeobusquedasControl extends M.Control {
     this.clearButtonEL = html.querySelectorAll('button#clearButton')[0];
     this.filterFieldsEL = html.querySelectorAll('label#label-filters')[0];
     this.filtersContainerEL = html.querySelectorAll('div#filter-container')[0];
-    this.filtersOptionsEL = html.querySelectorAll('div#filters-options')[0];
+    this.filtersOptionsEL = html.querySelectorAll('form#filters-options')[0];
     /* SE CREAN Y CONFIGURAR LOS CHOICE.JS*/
     this.choicesSelectorIndicesTab1EL = new Choices(this.selectorIndicesTab1EL, { allowHTML: true, placeholderValue: 'Seleccione un indice', placeholder: true, searchPlaceholderValue: 'Seleccione un indice', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true });
     this.choicesSelectorCamposTab1EL = new Choices(this.selectorCamposTab1EL, { allowHTML: true, placeholderValue: 'Seleccione un campo', placeholder: true, searchPlaceholderValue: 'Seleccione un campo', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true, removeItems: true, removeItemButton: true, });
@@ -436,12 +436,16 @@ export default class GeobusquedasControl extends M.Control {
         my_input.setAttribute('name', 'filtro_' + field);
         my_input.setAttribute('type', 'number');
         my_input.setAttribute('class', 'inputFilters');
+        my_input.setAttribute('step', '1');
+        my_input.setAttribute('pattern', '[0-9]');
         break;
       case 'double':
         my_input = document.createElement('input');
         my_input.setAttribute('id', 'filtro_' + field);
         my_input.setAttribute('name', 'filtro_' + field);
         my_input.setAttribute('type', 'number');
+        my_input.setAttribute('pattern', '[0-9]');
+        my_input.setAttribute('step', '.01');
         my_input.setAttribute('class', 'inputFilters');
         break;
       case 'keyword':
@@ -463,10 +467,11 @@ export default class GeobusquedasControl extends M.Control {
     my_div.appendChild(my_label);
     if (my_input) {
       my_div.appendChild(my_input);
+      this.getBasictStatsFields(field, my_input)
     }
     if (my_select) {
       my_div.appendChild(my_select);
-      this.getDistinctValuesinField(field,my_select)
+      this.getDistinctValuesinField(field, my_select)
     }
     this.filtersOptionsEL.appendChild(my_div)
   }
@@ -477,7 +482,7 @@ export default class GeobusquedasControl extends M.Control {
     }
   }
 
-  getDistinctValuesinField(my_field,my_select) {
+  getDistinctValuesinField(my_field, my_select) {
     let indice = this.choicesSelectorIndicesTab1EL.getValue(true);
     let request = {
       "size": 0,
@@ -496,7 +501,7 @@ export default class GeobusquedasControl extends M.Control {
     let url = this.config_.url + '/' + indice + '/search?'
     M.proxy(false);
     M.remote.post(url, request).then((res) => {
-      
+
       let response = JSON.parse(res.text);
       let buckets = response['aggregations']['my-agg-name']['buckets'];
 
@@ -510,17 +515,58 @@ export default class GeobusquedasControl extends M.Control {
       });
 
       let choiceSelectEL = new Choices(my_select, { allowHTML: true, choices: my_options, placeholderValue: 'Seleccione un valor', placeholder: true, searchPlaceholderValue: 'Seleccione un valor', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true, removeItems: true, removeItemButton: true, });
-      my_select.addEventListener('change',()=>{
+      my_select.addEventListener('change', () => {
         console.log(choiceSelectEL.getValue(true));
       })
     })
   }
 
-  getBasictStatsFields(my_field,my_input){
-    console.log(my_field,my_input)
+  getBasictStatsFields(my_field, my_input) {
+    let indice = this.choicesSelectorIndicesTab1EL.getValue(true);
+    let url = this.config_.url + '/' + indice + '/search?'
+    let request = {
+      "size": 0,
+      "aggs": {
+        "fields_stats": {
+          "stats": {
+            "field": my_field
+          }
+        }
+      }
+    }
+    M.proxy(false);
+    M.remote.post(url, request).then((res) => {
+      let response = JSON.parse(res.text);
+      my_input.setAttribute('min', response['aggregations']['fields_stats']['min']);
+      my_input.setAttribute('max', response['aggregations']['fields_stats']['max']);
+      my_input.setAttribute('placeholder', 'introduce un valor entre ' + response['aggregations']['fields_stats']['min'] + ' y ' + response['aggregations']['fields_stats']['max']);
+
+      my_input.addEventListener('change', () => {
+        console.log(my_input.value)
+      })
+    })
   }
 
-  getAdvancedtStatsFields(my_field,my_input){
-    console.log(my_field,my_input)
+  getAdvancedtStatsFields(my_field, my_input) {
+    let indice = this.choicesSelectorIndicesTab1EL.getValue(true);
+    let url = this.config_.url + '/' + indice + '/search?'
+    let request = {
+      "size": 0,
+      "aggs": {
+        "fields_stats": {
+          "extended_stats": {
+            "field": my_field,
+            "missing": 0
+          }
+        }
+      }
+    }
+
+    M.proxy(false);
+    M.remote.post(url, request).then((res) => {
+      let response = JSON.parse(res.text);
+
+      console.log(response)
+    })
   }
 }
