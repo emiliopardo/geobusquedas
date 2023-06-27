@@ -154,6 +154,7 @@ export default class GeobusquedasControl extends M.Control {
     this.selectorIndicesTab1EL = html.querySelectorAll('select#selectorIndices-tab1')[0];
     this.selectorIndicesTab2EL = html.querySelectorAll('select#selectorIndices-tab2')[0];
     this.selectorCamposTab1EL = html.querySelectorAll('select#selectorCampos')[0];
+    this.selectorCamposFiltrosTab1EL = html.querySelectorAll('select#selectorCamposFiltros')[0];
     this.selectorEditorCodeMirrorTab2EL = html.querySelectorAll('div#editorCodeMirror')[0];
     this.loadButtonEL = html.querySelectorAll('button#loadButton')[0];
     this.clearButtonEL = html.querySelectorAll('button#clearButton')[0];
@@ -162,10 +163,12 @@ export default class GeobusquedasControl extends M.Control {
     /* SE CREAN Y CONFIGURAR LOS CHOICE.JS*/
     this.choicesSelectorIndicesTab1EL = new Choices(this.selectorIndicesTab1EL, { allowHTML: true, placeholderValue: 'Seleccione un indice', placeholder: true, searchPlaceholderValue: 'Seleccione un indice', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true });
     this.choicesSelectorCamposTab1EL = new Choices(this.selectorCamposTab1EL, { allowHTML: true, placeholderValue: 'Seleccione un campo', placeholder: true, searchPlaceholderValue: 'Seleccione un campo', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true, removeItems: true, removeItemButton: true, });
+    this.choicesSelectorCamposFiltrosTab1EL = new Choices(this.selectorCamposFiltrosTab1EL, { allowHTML: true, placeholderValue: 'Seleccione un campo para filtrar', placeholder: true, searchPlaceholderValue: 'Seleccione un campo', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true, removeItems: true, removeItemButton: true, });
     this.choicesSelectorIndicesTab2EL = new Choices(this.selectorIndicesTab2EL, { allowHTML: true, placeholderValue: 'Seleccione un indice', placeholder: true, searchPlaceholderValue: 'Seleccione un indice', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true });
 
     /* INICIALIZAMOS EL CHOICE DE CAMPOS A DISABLE */
     this.choicesSelectorCamposTab1EL.disable();
+    this.choicesSelectorCamposFiltrosTab1EL.disable();
     /* CARGAMOS EDITOR CODEMIRROR  */
     this.editor = new EditorView({
       state: this.startState_,
@@ -219,10 +222,13 @@ export default class GeobusquedasControl extends M.Control {
         case 1:
           this.choicesSelectorIndicesTab1EL.destroy();
           this.choicesSelectorCamposTab1EL.destroy();
+          this.choicesSelectorCamposFiltrosTab1EL.destroy();
           this.choicesSelectorIndicesTab1EL = new Choices(this.selectorIndicesTab1EL, { allowHTML: true, placeholderValue: 'Seleccione un indice', placeholder: true, searchPlaceholderValue: 'Seleccione un indice', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true });
           this.choicesSelectorIndicesTab1EL.setChoices(this.IndexsListoptions)
           this.choicesSelectorCamposTab1EL = new Choices(this.selectorCamposTab1EL, { allowHTML: true, placeholderValue: 'Seleccione un campo', placeholder: true, searchPlaceholderValue: 'Seleccione un campo', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true, removeItems: true, removeItemButton: true, });
           this.choicesSelectorCamposTab1EL.disable();
+          this.choicesSelectorCamposFiltrosTab1EL = new Choices(this.selectorCamposFiltrosTab1EL, { allowHTML: true, placeholderValue: 'Seleccione un campo para filtrar', placeholder: true, searchPlaceholderValue: 'Seleccione un campo', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true, removeItems: true, removeItemButton: true, });
+          this.choicesSelectorCamposFiltrosTab1EL.disable();
           break
         case 2:
           this.choicesSelectorIndicesTab2EL.destroy();
@@ -278,11 +284,20 @@ export default class GeobusquedasControl extends M.Control {
     M.remote.get(this.config_.url + '/' + index + '/fields').then((response) => {
       let indexInfo = JSON.parse(response.text);
       let fieldsObject = indexInfo[index]['mappings']['properties'];
-      let fieldsArray = Object.keys(fieldsObject)
-      let options = new Array()
+      let fieldsArray = Object.keys(fieldsObject);
+      let options = new Array();
+      let fieldsFilters = new Array();
 
       fieldsArray.forEach(field => {
         if (field != 'geom') {
+
+          let filter = {
+            field: field,
+            type: fieldsObject[field]['type']
+          }
+
+          fieldsFilters.push(filter)
+
           let option = {
             value: field,
             label: field,
@@ -294,8 +309,11 @@ export default class GeobusquedasControl extends M.Control {
       })
       //reseteo el choice y defino el listado de opciones del choice
       this.choicesSelectorCamposTab1EL.setChoices(options, 'value', 'label', true);
+      this.choicesSelectorCamposFiltrosTab1EL.setChoices(options, 'value', 'label', true);
       //activo el choice
       this.choicesSelectorCamposTab1EL.enable();
+      this.choicesSelectorCamposFiltrosTab1EL.enable();
+      // this.createFiltersDOMElement(fieldsFilters)
     })
   }
 
@@ -376,5 +394,57 @@ export default class GeobusquedasControl extends M.Control {
         this.map_.setBbox(capaGeoJSON.getMaxExtent())
       })
     })
+  }
+
+  createFiltersDOMElement(fieldsFilters) {
+    //   <div id="campos" class="opciones-busqueda">
+    //   <label class="label-opciones-busqueda" for="selectorCampos">Campos</label>
+    //   <select id="selectorCampos" name="selectorCampos" default-label="Campos" multiple>
+    //   </select>
+    // </div>
+    fieldsFilters.forEach(element => {
+      // construimos elemento div
+      let my_div = document.createElement('div');
+      my_div.setAttribute('id', element['field']);
+      my_div.setAttribute('name', element['field']);
+      my_div.setAttribute('class', 'opciones-busqueda');
+      // construimos elemento label
+      let my_label = document.createElement("label");
+      my_label.setAttribute('class', 'label-opciones-busqueda');
+      my_label.setAttribute('for', 'filtro_' + element['field']);
+      my_label.innerHTML = element['field'];
+      let my_input = document.createElement('input');
+      if (element.type == 'long') {
+        my_input.setAttribute('id', 'filtro_' + element['field']);
+        my_input.setAttribute('name', 'filtro_' + element['field']);
+        my_input.setAttribute('type','number');
+        my_input.setAttribute('class', 'inputFilters');
+      } else if (element.type == 'double') {
+        let my_input = document.createElement('input');
+        my_input.setAttribute('id', 'filtro_' + element['field']);
+        my_input.setAttribute('name', 'filtro_' + element['field']);
+        my_input.setAttribute('type','number');
+        my_input.setAttribute('class', 'inputFilters');
+      } else if (element.type == 'text') {
+        my_input.setAttribute('id', 'filtro_' + element['field']);
+        my_input.setAttribute('name', 'filtro_' + element['field']);
+        my_input.setAttribute('type','text');
+        my_input.setAttribute('class', 'inputFilters');
+      } else if (element.type == 'keyword') {
+        my_input.setAttribute('id', 'filtro_' + element['field']);
+        my_input.setAttribute('name', 'filtro_' + element['field']);
+        my_input.setAttribute('type','text');
+        my_input.setAttribute('class', 'inputFilters');
+      }
+
+      my_div.appendChild(my_label);
+      my_div.appendChild(my_input);
+
+
+
+
+      this.filtersContainerEL.appendChild(my_div)
+
+    });
   }
 }
