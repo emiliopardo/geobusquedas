@@ -205,16 +205,7 @@ export default class GeobusquedasControl extends M.Control {
       this.createFilters(this.choicesSelectorCamposFiltrosTab1EL.getValue(true));
     })
 
-    this.filterFieldsEL.addEventListener('click', () => {
-      let myIcon = this.filterFieldsEL.firstChild
-      myIcon.classList.toggle('g-cartografia-mas2')
-      myIcon.classList.toggle('g-cartografia-menos2')
-      if (myIcon.classList.contains('g-cartografia-menos2')) {
-        this.filtersContainerEL.style.display = 'block'
-      } else {
-        this.filtersContainerEL.style.display = 'none'
-      }
-    })
+    this.filterFieldsEL.addEventListener('click', () => { this.showHideFilters() });
 
     this.selectorIndicesTab2EL.addEventListener('change', () => {
       this.loadButtonEL.disabled = false;
@@ -235,6 +226,8 @@ export default class GeobusquedasControl extends M.Control {
           this.choicesSelectorCamposTab1EL.disable();
           this.choicesSelectorCamposFiltrosTab1EL = new Choices(this.selectorCamposFiltrosTab1EL, { allowHTML: true, placeholderValue: 'Seleccione un campo para filtrar', placeholder: true, searchPlaceholderValue: 'Seleccione un campo', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true, removeItems: true, removeItemButton: true, });
           this.choicesSelectorCamposFiltrosTab1EL.disable();
+          this.removeAllChildNodes(this.filtersOptionsEL);
+          this.showHideFilters();
           break
         case 2:
           this.choicesSelectorIndicesTab2EL.destroy();
@@ -417,6 +410,17 @@ export default class GeobusquedasControl extends M.Control {
   }
 
   createFiltersDOMElement(field, type) {
+    const comparacionNumeros = ['igual que', 'menor que', 'mayor que'];
+    let my_comparacionNumeros = document.createElement('select');
+    my_comparacionNumeros.setAttribute('class', 'comparacionNumeros')
+
+    comparacionNumeros.forEach(element => {
+      let option = document.createElement('option');
+      option.setAttribute('value', element);
+      option.text = element;
+      my_comparacionNumeros.appendChild(option)
+    });
+
     // construimos elemento div
     let my_div = document.createElement('div');
     my_div.setAttribute('id', field);
@@ -431,6 +435,9 @@ export default class GeobusquedasControl extends M.Control {
     let my_select;
     switch (type) {
       case 'long':
+        my_div.appendChild(my_label);
+        my_comparacionNumeros.setAttribute('id', 'comparacion_filtro_' + field);
+        my_div.appendChild(my_comparacionNumeros)
         my_input = document.createElement('input');
         my_input.setAttribute('id', 'filtro_' + field);
         my_input.setAttribute('name', 'filtro_' + field);
@@ -438,8 +445,13 @@ export default class GeobusquedasControl extends M.Control {
         my_input.setAttribute('class', 'inputFilters');
         my_input.setAttribute('step', '1');
         my_input.setAttribute('pattern', '[0-9]');
+        my_div.appendChild(my_input);
+        this.getBasictStatsFields(field, my_input)
         break;
       case 'double':
+        my_div.appendChild(my_label);
+        my_comparacionNumeros.setAttribute('id', 'comparacion_filtro_' + field);
+        my_div.appendChild(my_comparacionNumeros);
         my_input = document.createElement('input');
         my_input.setAttribute('id', 'filtro_' + field);
         my_input.setAttribute('name', 'filtro_' + field);
@@ -447,14 +459,20 @@ export default class GeobusquedasControl extends M.Control {
         my_input.setAttribute('pattern', '[0-9]');
         my_input.setAttribute('step', '.01');
         my_input.setAttribute('class', 'inputFilters');
+        my_div.appendChild(my_input);
+        this.getBasictStatsFields(field, my_input)
         break;
       case 'keyword':
+        my_div.appendChild(my_label);
         my_select = document.createElement('select');
         my_select.setAttribute('id', 'filtro_' + field);
         my_select.setAttribute('name', 'filtro_' + field);
         my_select.setAttribute('multiple', true);
+        my_div.appendChild(my_select);
+        this.getDistinctValuesinField(field, my_select)
         break;
       case 'text':
+        my_div.appendChild(my_label);
         my_input = document.createElement('input');
         my_input.setAttribute('id', 'filtro_' + field);
         my_input.setAttribute('name', 'filtro_' + field);
@@ -464,16 +482,7 @@ export default class GeobusquedasControl extends M.Control {
       default:
         break;
     }
-    my_div.appendChild(my_label);
-    if (my_input) {
-      my_div.appendChild(my_input);
-      this.getBasictStatsFields(field, my_input)
-    }
-    if (my_select) {
-      my_div.appendChild(my_select);
-      this.getDistinctValuesinField(field, my_select)
-    }
-    this.filtersOptionsEL.appendChild(my_div)
+    this.filtersOptionsEL.appendChild(my_div);
   }
 
   removeAllChildNodes(parent) {
@@ -538,9 +547,14 @@ export default class GeobusquedasControl extends M.Control {
     M.remote.post(url, request).then((res) => {
       let response = JSON.parse(res.text);
       my_input.setAttribute('min', response['aggregations']['fields_stats']['min']);
-      my_input.setAttribute('max', response['aggregations']['fields_stats']['max']);
-      my_input.setAttribute('placeholder', 'introduce un valor entre ' + response['aggregations']['fields_stats']['min'] + ' y ' + response['aggregations']['fields_stats']['max']);
-
+      my_input.setAttribute('max', response['aggregations']['fields_stats']['max'])
+      my_input.setAttribute('placeholder', 'introduce un valor');
+      let myMinMaxlabel = document.createElement("label");
+      myMinMaxlabel.setAttribute('id', 'rango_' + my_field);
+      myMinMaxlabel.setAttribute('class', 'label_rango_valor');
+      myMinMaxlabel.innerHTML = '* introduce un valor entre ' + response['aggregations']['fields_stats']['min'] + ' y ' + response['aggregations']['fields_stats']['max']
+      let parentDiv = document.getElementById(my_field);
+      parentDiv.appendChild(myMinMaxlabel)
       my_input.addEventListener('change', () => {
         console.log(my_input.value)
       })
@@ -568,5 +582,18 @@ export default class GeobusquedasControl extends M.Control {
 
       console.log(response)
     })
+  }
+
+  showHideFilters() {
+    {
+      let myIcon = this.filterFieldsEL.firstChild
+      myIcon.classList.toggle('g-cartografia-mas2')
+      myIcon.classList.toggle('g-cartografia-menos2')
+      if (myIcon.classList.contains('g-cartografia-menos2')) {
+        this.filtersContainerEL.style.display = 'block'
+      } else {
+        this.filtersContainerEL.style.display = 'none'
+      }
+    }
   }
 }
