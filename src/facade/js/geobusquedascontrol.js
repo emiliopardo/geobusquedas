@@ -35,6 +35,7 @@ export default class GeobusquedasControl extends M.Control {
     this.IndexsListoptions = new Array();
     this.config_ = config;
     this.activePanel = 1;
+    this.fieldFilterList = new Array();
     //Número maximo de documentos devueltos por elastic
     this.MAX_QUERY_SIZE = 10000;
 
@@ -202,7 +203,7 @@ export default class GeobusquedasControl extends M.Control {
 
     this.selectorCamposFiltrosTab1EL.addEventListener('change', () => {
       this.removeAllChildNodes(this.filtersOptionsEL);
-      this.createFilters(this.choicesSelectorCamposFiltrosTab1EL.getValue(true));
+      this.createInputFilters(this.choicesSelectorCamposFiltrosTab1EL.getValue(true));
     })
 
     this.filterFieldsEL.addEventListener('click', () => { this.showHideFilters() });
@@ -228,6 +229,7 @@ export default class GeobusquedasControl extends M.Control {
           this.choicesSelectorCamposFiltrosTab1EL.disable();
           this.removeAllChildNodes(this.filtersOptionsEL);
           this.showHideFilters();
+          this.fieldFilterList = new Array();
           break
         case 2:
           this.choicesSelectorIndicesTab2EL.destroy();
@@ -317,8 +319,31 @@ export default class GeobusquedasControl extends M.Control {
 
   search() {
     let request;
-    let indice
-    let campos
+    let indice;
+    let campos;
+    if (this.filtersOptionsEL.hasChildNodes()) {
+      this.createFilterQuery(this.filtersOptionsEL.childNodes);
+    }
+    this.fieldFilterList.forEach(element => {
+      if (element['type'] == 'number' && element['operator'] != 'igual que') {
+        let my_range = "{\"range\":{\""+element['field']+"\":{\""+this.parseOperators(element['operator'])+"\":"+element['value']+"}}}"
+        console.log(JSON.parse(my_range));
+      } else if(element['type'] == 'number' && element['operator'] == 'igual que') {
+        console.log(element);
+        let my_term = "{\"term\":{\""+element['field']+"\":"+element['value']+"}}"
+        console.log(JSON.parse(my_term));
+      } else if(element['type'] == 'text' && element['value'].length>1) {
+        let my_values =""
+        element['value'].forEach(element => {
+          my_values = my_values+"\""+element+"\","; 
+        });
+        let my_terms = "{\"terms\":{\""+element['field']+"\":["+my_values+"]}}";
+        console.log(JSON.parse(my_terms.replace(',]',']')));
+      } else if(element['type'] == 'text' && element['value'].length==1) {
+        let my_term = "{\"term\":{\""+element['field']+"\":\""+element['value']+"\"}}"
+        console.log(JSON.parse(my_term));
+      }
+    });
 
     switch (this.activePanel) {
       case 1:
@@ -394,14 +419,14 @@ export default class GeobusquedasControl extends M.Control {
     })
   }
 
-  createFilters(arrayFields) {
+  createInputFilters(arrayFields) {
     arrayFields.forEach(field => {
       let find = false;
       do {
         this.fieldsFilters.forEach(element => {
           if (element['field'] == field) {
             find = true;
-            this.createFiltersDOMElement(element['field'], element['type']);
+            this.createInputFiltersDOMElement(element['field'], element['type']);
             find = true;
           }
         });
@@ -409,7 +434,7 @@ export default class GeobusquedasControl extends M.Control {
     });
   }
 
-  createFiltersDOMElement(field, type) {
+  createInputFiltersDOMElement(field, type) {
     const comparacionNumeros = ['igual que', 'menor que', 'mayor que'];
     let my_comparacionNumeros = document.createElement('select');
     my_comparacionNumeros.setAttribute('class', 'comparacionNumeros')
@@ -430,6 +455,7 @@ export default class GeobusquedasControl extends M.Control {
     let my_label = document.createElement("label");
     my_label.setAttribute('class', 'label-opciones-busqueda');
     my_label.setAttribute('for', 'filtro_' + field);
+    my_label.setAttribute('id', 'label_filtro_' + field);
     my_label.innerHTML = field;
     let my_input;
     let my_select;
@@ -525,7 +551,14 @@ export default class GeobusquedasControl extends M.Control {
 
       let choiceSelectEL = new Choices(my_select, { allowHTML: true, choices: my_options, placeholderValue: 'Seleccione un valor', placeholder: true, searchPlaceholderValue: 'Seleccione un valor', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true, removeItems: true, removeItemButton: true, });
       my_select.addEventListener('change', () => {
-        console.log(choiceSelectEL.getValue(true));
+        this.fieldFilterList = new Array();
+        let filter = {
+          field: my_field,
+          type: 'text',
+          value: choiceSelectEL.getValue(true)
+        }
+        this.fieldFilterList.push(filter);
+        this.createFilterQuery(this.filtersOptionsEL.childNodes);
       })
     })
   }
@@ -555,9 +588,6 @@ export default class GeobusquedasControl extends M.Control {
       myMinMaxlabel.innerHTML = '* introduce un valor entre ' + response['aggregations']['fields_stats']['min'] + ' y ' + response['aggregations']['fields_stats']['max']
       let parentDiv = document.getElementById(my_field);
       parentDiv.appendChild(myMinMaxlabel)
-      my_input.addEventListener('change', () => {
-        console.log(my_input.value)
-      })
     })
   }
 
@@ -595,5 +625,45 @@ export default class GeobusquedasControl extends M.Control {
         this.filtersContainerEL.style.display = 'none'
       }
     }
+  }
+
+  createFilterQuery(filtersDOMElements) {
+    filtersDOMElements.forEach(filterDom => {
+      let field = filterDom.getAttribute('id');
+      let filterDomChilds = filterDom.childNodes;
+      filterDomChilds.forEach(element => {
+        if (element.getAttribute('id') == 'filtro_' + field && element.getAttribute('type') == 'number' && element.value != '') {
+          let operador = document.getElementById('comparacion_filtro_' + field);
+          let filter = {
+            field: field,
+            type: 'number',
+            operator: operador.value,
+            value: element.value
+          }
+          this.fieldFilterList.push(filter)
+        }
+      });
+    });
+  }
+
+  parseOperators(operator) {
+    let result
+    switch (operator) {
+      case 'mayor que':
+        result = "gt"
+        break;
+      case 'mayor o igual que':
+        result = "gte"
+        break;
+      case 'menor que':
+        result = "lt"
+        break;
+      case 'menor o igual que':
+        result = "lte"
+        break;
+      default:
+        break;
+    }
+    return result
   }
 }
