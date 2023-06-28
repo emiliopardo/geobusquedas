@@ -174,6 +174,7 @@ div.opciones-busqueda {
   height: auto;
   background-color: transparent;
   border: 1px solid #eaeaea;
+  padding-bottom: 10px;
   border-bottom-left-radius: 2.5px;
   border-bottom-right-radius: 2.5px;
 }
@@ -249,13 +250,76 @@ div#m-geobusquedas-buttons>button:disabled {
   overflow: auto
 }
 
-input.inputFilters {
+input[type=number].inputFilters {
+  width: 75% !important;
+}
+
+input[type=number].inputFilters:hover,
+input[type=number].inputFilters:active,
+input[type=number].inputFilters:focus {
+  border: 1px solid #6c6c6c !important;
+}
+
+input[type=text].inputFilters {
   width: 96% !important;
+}
+
+input.inputFilters {
+  font-size: 10px;
+  color: #6c6c6c;
+  display: inline-block;
   height: 20px;
-  /* font-size: 10px !important; */
-  vertical-align: top!important;
-  background-color: #f9f9f9!important;
-  padding: 7.5px 7.5px 3.75px!important;
-  border: 1px solid #ddd!important;
-  border-radius: 2.5px!important;
+  vertical-align: top !important;
+  background-color: #f9f9f9 !important;
+  padding: 7.5px 7.5px 3.75px !important;
+  border: 1px solid #ddd !important;
+  border-radius: 2.5px !important;
+}
+
+select.comparacionNumeros {
+  font-size: 10px;
+  color: #6c6c6c;
+  display: inline-block;
+  height: 33px;
+  vertical-align: top !important;
+  width: 20% !important;
+  margin-right: 5px;
+  background-color: #f9f9f9 !important;
+  padding: 7.5px 7.5px 3.75px !important;
+  border: 1px solid #ddd !important;
+  border-radius: 2.5px !important;
+}
+
+/* Spin Buttons modified */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  color: #000;
+  -webkit-appearance: none;
+  background: #FFF url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJCAYAAADgkQYQAAAAKUlEQVQYlWNgwAT/sYhhKPiPT+F/LJgEsHv37v+EMGkmkuImoh2NoQAANlcun/q4OoYAAAAASUVORK5CYII=) no-repeat center center;
+  width: 1em;
+  border-left: 1px solid #BBB;
+  /* opacity: .5; shows Spin Buttons per default (Chrome >= 39) */
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+}
+
+input[type="number"]::-webkit-inner-spin-button:hover,
+input[type="number"]::-webkit-inner-spin-button:active {
+  /* box-shadow: 0 0 2px #0CF; */
+  color: #6c6c6c;
+  opacity: .8;
+}
+
+/* Override browser form filling */
+input:-webkit-autofill {
+  background: black;
+  color: red;
+}
+
+label.label_rango_valor {
+  font-size: 10px;
+  color: #6c6c6c;
+  font-weight: normal;
 }
