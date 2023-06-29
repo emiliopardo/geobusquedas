@@ -21,15 +21,42 @@
             </select>
           </div>
           <div id="filtros" class="opciones-busqueda">
-            <label id="label-filters" class="label-filters"><i class="g-cartografia-mas2"></i>&#32;&#32;Filtros</label>
+            <label id="label-filters" class="label-filters"><i class="g-cartografia-mas2"></i>&#32;&#32;Filtro
+              Temático</label>
             <div id="filter-container">
               <label class="label-opciones-busqueda" for="selectorCamposFiltros">Campos</label>
               <select id="selectorCamposFiltros" name="selectorCamposFiltros" default-label="Campos" multiple>
               </select>
-              <div id="div-filters-options">
-                <form id="filters-options">
-                </form>
+              <form id="filters-options">
+              </form>
+            </div>
+          </div>
+          <div id="geom" name="geom" class="opciones-busqueda">
+            <label id="label-filter-geom" class="label-filters"><i class="g-cartografia-mas2"></i>&#32;&#32;Filtro
+              Espacial</label>
+            <div id="filter-geom-container">
+              <label class="label-opciones-busqueda" for="filtro_geom" id="label_filtro_geom">Activar / Desactivar
+                Filtro Espacial</label>
+              <label class="switcherActiveGeomFilter"
+                title="Al activar el filtro se podrán capturar las coordenadas x,y del centro">
+                <input id="checkboxGeomFilter" type="checkbox">
+                <span class="slider round"></span>
+              </label>
+              <div id="coordinates-container">
+                <label for="coordenada_x" class="label-opciones-busqueda">Coordenada X:</label><input id="coordenada_x"
+                  name="coordenada_x" class="inputFilterGeom" type="number" disabled>
+                <label for="coordenada_y" class="label-opciones-busqueda">Coordenada Y:</label><input id="coordenada_y"
+                  name="coordenada_y" class="inputFilterGeom" type="number" disabled>
               </div>
+              <div id="range-container">
+                <label for="distance" class="label-opciones-busqueda">Radio (entre 1 and
+                  100 km):</label>
+                <input type="range" id="distance" name="distance" min="1" max="100" value="50"
+                  oninput="this.nextElementSibling.value = ' '+this.value+' Km'" disabled>
+                <output>50 Km</output>
+              </div>
+              <span class="info-opciones">* Al activar el filtro espacial y hacer click en el mapa se copiaran las coordendas X e Y</span>
+
             </div>
           </div>
         </div>
@@ -58,4 +85,3 @@
     </div>
   </div>
 </div>
-
