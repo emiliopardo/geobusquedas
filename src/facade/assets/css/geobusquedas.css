@@ -323,3 +323,7 @@ label.label_rango_valor {
   color: #6c6c6c;
   font-weight: normal;
 }
+
+.m-dialog.info div.m-button>button, .m-dialog.info div.m-title {
+  background-color: #00796b !important;
+}
