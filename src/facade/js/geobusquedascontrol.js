@@ -216,29 +216,23 @@ export default class GeobusquedasControl extends M.Control {
       this.search();
     })
     this.clearButtonEL.addEventListener('click', () => {
-      switch (this.activePanel) {
-        case 1:
-          this.choicesSelectorIndicesTab1EL.destroy();
-          this.choicesSelectorCamposTab1EL.destroy();
-          this.choicesSelectorCamposFiltrosTab1EL.destroy();
-          this.choicesSelectorIndicesTab1EL = new Choices(this.selectorIndicesTab1EL, { allowHTML: true, placeholderValue: 'Seleccione un indice', placeholder: true, searchPlaceholderValue: 'Seleccione un indice', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true });
-          this.choicesSelectorIndicesTab1EL.setChoices(this.IndexsListoptions)
-          this.choicesSelectorCamposTab1EL = new Choices(this.selectorCamposTab1EL, { allowHTML: true, placeholderValue: 'Seleccione un campo', placeholder: true, searchPlaceholderValue: 'Seleccione un campo', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true, removeItems: true, removeItemButton: true, });
-          this.choicesSelectorCamposTab1EL.disable();
-          this.choicesSelectorCamposFiltrosTab1EL = new Choices(this.selectorCamposFiltrosTab1EL, { allowHTML: true, placeholderValue: 'Seleccione un campo para filtrar', placeholder: true, searchPlaceholderValue: 'Seleccione un campo', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true, removeItems: true, removeItemButton: true, });
-          this.choicesSelectorCamposFiltrosTab1EL.disable();
-          this.removeAllChildNodes(this.filtersOptionsEL);
-          this.showHideFilters();
-          this.fieldFilterList = new Array();
-          break
-        case 2:
-          this.choicesSelectorIndicesTab2EL.destroy();
-          this.choicesSelectorIndicesTab2EL = new Choices(this.selectorIndicesTab2EL, { allowHTML: true, placeholderValue: 'Seleccione un indice', placeholder: true, searchPlaceholderValue: 'Seleccione un indice', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true });
-          this.choicesSelectorIndicesTab2EL.setChoices(this.IndexsListoptions)
-          /* RESETEAMOS LOS VALORES DEL EDITOR */
-          this.editor.setState(this.startState_);
-          break
-      }
+      this.choicesSelectorIndicesTab1EL.destroy();
+      this.choicesSelectorCamposTab1EL.destroy();
+      this.choicesSelectorCamposFiltrosTab1EL.destroy();
+      this.choicesSelectorIndicesTab1EL = new Choices(this.selectorIndicesTab1EL, { allowHTML: true, placeholderValue: 'Seleccione un indice', placeholder: true, searchPlaceholderValue: 'Seleccione un indice', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true });
+      this.choicesSelectorIndicesTab1EL.setChoices(this.IndexsListoptions)
+      this.choicesSelectorCamposTab1EL = new Choices(this.selectorCamposTab1EL, { allowHTML: true, placeholderValue: 'Seleccione un campo', placeholder: true, searchPlaceholderValue: 'Seleccione un campo', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true, removeItems: true, removeItemButton: true, });
+      this.choicesSelectorCamposTab1EL.disable();
+      this.choicesSelectorCamposFiltrosTab1EL = new Choices(this.selectorCamposFiltrosTab1EL, { allowHTML: true, placeholderValue: 'Seleccione un campo para filtrar', placeholder: true, searchPlaceholderValue: 'Seleccione un campo', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true, removeItems: true, removeItemButton: true, });
+      this.choicesSelectorCamposFiltrosTab1EL.disable();
+      this.removeAllChildNodes(this.filtersOptionsEL);
+      this.showHideFilters();
+      this.fieldFilterList = new Array();
+      this.choicesSelectorIndicesTab2EL.destroy();
+      this.choicesSelectorIndicesTab2EL = new Choices(this.selectorIndicesTab2EL, { allowHTML: true, placeholderValue: 'Seleccione un indice', placeholder: true, searchPlaceholderValue: 'Seleccione un indice', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true });
+      this.choicesSelectorIndicesTab2EL.setChoices(this.IndexsListoptions)
+      /* RESETEAMOS LOS VALORES DEL EDITOR */
+      this.editor.setState(this.startState_);
       this.loadButtonEL.disabled = true;
       this.clearButtonEL.disabled = true;
       let layerList = this.map_.getLayers()
@@ -318,60 +312,61 @@ export default class GeobusquedasControl extends M.Control {
   }
 
   search() {
-    let request;
-    let indice;
-    let campos;
+    let indice = this.choicesSelectorIndicesTab1EL.getValue(true);
+    let campos = this.choicesSelectorCamposTab1EL.getValue(true);
+    let must = new Array()
+    campos.push('geom');
+    let my_request = {
+      "query": {
+        "bool": {
+          "must": []
+        }
+      },
+      "_source": {
+        "includes": []
+      },
+      "size": this.MAX_QUERY_SIZE,
+    }
     if (this.filtersOptionsEL.hasChildNodes()) {
       this.createFilterQuery(this.filtersOptionsEL.childNodes);
     }
     this.fieldFilterList.forEach(element => {
       if (element['type'] == 'number' && element['operator'] != 'igual que') {
-        let my_range = "{\"range\":{\""+element['field']+"\":{\""+this.parseOperators(element['operator'])+"\":"+element['value']+"}}}"
-        console.log(JSON.parse(my_range));
-      } else if(element['type'] == 'number' && element['operator'] == 'igual que') {
-        console.log(element);
-        let my_term = "{\"term\":{\""+element['field']+"\":"+element['value']+"}}"
-        console.log(JSON.parse(my_term));
-      } else if(element['type'] == 'text' && element['value'].length>1) {
-        let my_values =""
+        let my_range = "{\"range\":{\"" + element['field'] + "\":{\"" + this.parseOperators(element['operator']) + "\":" + element['value'] + "}}}"
+        must.push(JSON.parse(my_range))
+      } else if (element['type'] == 'number' && element['operator'] == 'igual que') {
+        let my_term = "{\"term\":{\"" + element['field'] + "\":" + element['value'] + "}}"
+        must.push(JSON.parse(my_term))
+      } else if (element['type'] == 'text' && element['value'].length > 1) {
+        let my_values = ""
         element['value'].forEach(element => {
-          my_values = my_values+"\""+element+"\","; 
+          my_values = my_values + "\"" + element + "\",";
         });
-        let my_terms = "{\"terms\":{\""+element['field']+"\":["+my_values+"]}}";
-        console.log(JSON.parse(my_terms.replace(',]',']')));
-      } else if(element['type'] == 'text' && element['value'].length==1) {
-        let my_term = "{\"term\":{\""+element['field']+"\":\""+element['value']+"\"}}"
-        console.log(JSON.parse(my_term));
+        let my_terms = "{\"terms\":{\"" + element['field'] + "\":[" + my_values + "]}}";
+        must.push(JSON.parse(my_terms.replace(',]', ']')))
+      } else if (element['type'] == 'text' && element['value'].length == 1) {
+        let my_term = "{\"term\":{\"" + element['field'] + "\":\"" + element['value'] + "\"}}"
+        must.push(JSON.parse(my_term))
       }
     });
 
+    my_request['query']['bool']['must'] = must;
+    my_request['_source']['includes'] = campos;
+
     switch (this.activePanel) {
       case 1:
-        indice = this.choicesSelectorIndicesTab1EL.getValue(true);
-        campos = this.choicesSelectorCamposTab1EL.getValue(true);
-        request = {
-          "query": {
-            "match_all": {},
-          },
-          "_source": {
-            "includes": campos,
-          },
-          "size": this.MAX_QUERY_SIZE,
-          // "size": 100,
-        }
+        this.editor.dispatch({ changes: { from: 0, to: this.editor.state.doc.length, insert: JSON.stringify(my_request, null, 2) } });
         break;
       case 2:
-        indice = this.choicesSelectorIndicesTab2EL.getValue(true);
-        request = JSON.parse(this.editor.state.doc.toString())
+        my_request = JSON.parse(this.editor.state.doc.toString())
         campos = new Array();
         break;
     }
     let capaGeoJSON
     M.proxy(false);
-    campos.push("geom")
     let url = this.config_.url + '/' + indice + '/search?'
 
-    M.remote.post(url, request).then((res) => {
+    M.remote.post(url, my_request).then((res) => {
       let layerList = this.map_.getLayers()
       layerList.forEach(layer => {
         if (layer.name == indice) {
@@ -383,39 +378,43 @@ export default class GeobusquedasControl extends M.Control {
       let Arrayfeatures = new Array()
       let response = JSON.parse(res.text)
       let results = response['hits']['hits']
-      results.forEach(element => {
+      if (results.length != 0) {
+        results.forEach(element => {
 
-        let miFeature = new M.Feature(element['_id'], {
-          "type": "Feature",
-          "id": "element['_id']",
-          "geometry": element['_source']['geom'],
-          "geometry_name": "geometry",
+          let miFeature = new M.Feature(element['_id'], {
+            "type": "Feature",
+            "id": "element['_id']",
+            "geometry": element['_source']['geom'],
+            "geometry_name": "geometry",
+          });
+
+          let fields = Object.keys(element['_source'])
+          fields.forEach(field => {
+            if (field != 'geom') {
+              miFeature.setAttribute(field, element['_source'][field])
+            }
+          });
+          Arrayfeatures.push(miFeature.getGeoJSON())
         });
 
-        let fields = Object.keys(element['_source'])
-        fields.forEach(field => {
-          if (field != 'geom') {
-            miFeature.setAttribute(field, element['_source'][field])
-          }
+        capaGeoJSON = new M.layer.GeoJSON({
+          source: {
+            "crs": { "properties": { "name": "EPSG:4326" }, "type": "name" },
+            "features": Arrayfeatures,
+            "type": "FeatureCollection"
+          },
+          name: indice
         });
-        Arrayfeatures.push(miFeature.getGeoJSON())
-      });
 
-      capaGeoJSON = new M.layer.GeoJSON({
-        source: {
-          "crs": { "properties": { "name": "EPSG:4326" }, "type": "name" },
-          "features": Arrayfeatures,
-          "type": "FeatureCollection"
-        },
-        name: indice
-      });
+        capaGeoJSON.setStyle(this.estilo);
 
-      capaGeoJSON.setStyle(this.estilo);
-
-      this.map_.addLayers(capaGeoJSON);
-      capaGeoJSON.on(M.evt.LOAD, () => {
-        this.map_.setBbox(capaGeoJSON.getMaxExtent())
-      })
+        this.map_.addLayers(capaGeoJSON);
+        capaGeoJSON.on(M.evt.LOAD, () => {
+          this.map_.setBbox(capaGeoJSON.getMaxExtent())
+        })
+      } else {
+        M.dialog.info('No se han encontrado resultados que se ajusten al filtro');
+      }
     })
   }
 
@@ -435,7 +434,7 @@ export default class GeobusquedasControl extends M.Control {
   }
 
   createInputFiltersDOMElement(field, type) {
-    const comparacionNumeros = ['igual que', 'menor que', 'mayor que'];
+    const comparacionNumeros = ['igual que', 'menor que', 'menor o igual que', 'mayor que', 'mayor o igual que'];
     let my_comparacionNumeros = document.createElement('select');
     my_comparacionNumeros.setAttribute('class', 'comparacionNumeros')
 
@@ -551,14 +550,13 @@ export default class GeobusquedasControl extends M.Control {
 
       let choiceSelectEL = new Choices(my_select, { allowHTML: true, choices: my_options, placeholderValue: 'Seleccione un valor', placeholder: true, searchPlaceholderValue: 'Seleccione un valor', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true, removeItems: true, removeItemButton: true, });
       my_select.addEventListener('change', () => {
-        this.fieldFilterList = new Array();
+        this.checkfieldFilterList(my_field)
         let filter = {
           field: my_field,
           type: 'text',
           value: choiceSelectEL.getValue(true)
         }
         this.fieldFilterList.push(filter);
-        this.createFilterQuery(this.filtersOptionsEL.childNodes);
       })
     })
   }
@@ -640,6 +638,7 @@ export default class GeobusquedasControl extends M.Control {
             operator: operador.value,
             value: element.value
           }
+          this.checkfieldFilterList(field);
           this.fieldFilterList.push(filter)
         }
       });
@@ -665,5 +664,10 @@ export default class GeobusquedasControl extends M.Control {
         break;
     }
     return result
+  }
+
+
+  checkfieldFilterList(fieldName) {
+    this.fieldFilterList = this.fieldFilterList.filter(element => element.field != fieldName);
   }
 }
