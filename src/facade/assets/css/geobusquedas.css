@@ -251,7 +251,7 @@ div#m-geobusquedas-buttons>button:disabled {
 }
 
 input[type=number].inputFilters {
-  width: 75% !important;
+  width: 70% !important;
 }
 
 input[type=number].inputFilters:hover,
@@ -282,7 +282,7 @@ select.comparacionNumeros {
   display: inline-block;
   height: 33px;
   vertical-align: top !important;
-  width: 20% !important;
+  width: 25% !important;
   margin-right: 5px;
   background-color: #f9f9f9 !important;
   padding: 7.5px 7.5px 3.75px !important;
