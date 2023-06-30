@@ -98,6 +98,10 @@ div.m-geobusquedas-title {
   color: #fff;
 }
 
+div#m-geobusquedas-tab{
+    border-bottom: 1px solid #ddd;
+}
+
 /* Estilo labels tab */
 label.m-geobusquedas-tab {
   display: inline-block;
@@ -106,7 +110,7 @@ label.m-geobusquedas-tab {
   font-weight: 600;
   text-align: center;
   color: #bbb;
-  border: 1px solid transparent;
+  border-bottom: 1px solid #ddd;
 }
 
 label.m-geobusquedas-tab:hover {
