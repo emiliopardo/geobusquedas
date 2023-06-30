@@ -182,7 +182,6 @@ div.opciones-busqueda {
   border-bottom-right-radius: 2.5px;
 }
 
-
 label {
   display: block;
   margin: 0 0 -1px;
@@ -277,6 +276,10 @@ input[type=number].inputFilterGeom {
   padding: 7.5px 7.5px 3.75px !important;
   border: 1px solid #ddd !important;
   border-radius: 2.5px !important;
+}
+
+input[type=number].inputFilterGeom:disabled {
+  cursor: not-allowed;
 }
 
 input.inputFilters {
@@ -444,6 +447,10 @@ input[type=range]:focus::-ms-fill-upper {
   background: #ddd;
 }
 
+input[type=range]:disabled {
+  cursor: not-allowed !important;
+}
+
 .g-cartografia-gps2 {
   color: #00796b !important
 }
@@ -520,4 +527,8 @@ input[type=checkbox]:checked+.slider:before {
   vertical-align: top;
   display: inline-block;
   width: 48%;
+}
+
+.disabled{
+  cursor: not-allowed;
 }
