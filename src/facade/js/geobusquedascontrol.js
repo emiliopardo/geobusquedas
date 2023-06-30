@@ -39,6 +39,7 @@ export default class GeobusquedasControl extends M.Control {
     this.distance;
     this.lat;
     this.lon;
+    this.geo_distance_filter;
     //Número maximo de documentos devueltos por elastic
     this.MAX_QUERY_SIZE = 10000;
 
@@ -168,7 +169,9 @@ export default class GeobusquedasControl extends M.Control {
     this.filterGeomContainerEL = html.querySelectorAll('div#filter-geom-container')[0];
     this.filtersOptionsEL = html.querySelectorAll('form#filters-options')[0];
     this.checkboxGeomFilterEL = html.querySelectorAll('input#checkboxGeomFilter')[0];
+    this.sliderEL = html.querySelectorAll('span.slider,span.round')[0];
     this.distanceEL = html.querySelectorAll('input#distance')[0];
+    this.distanceOutputEL = html.querySelectorAll('output#distance_value')[0];
     this.coordenadaXEL = html.querySelectorAll('input#coordenada_x')[0];
     this.coordenadaYEL = html.querySelectorAll('input#coordenada_y')[0];
 
@@ -187,13 +190,13 @@ export default class GeobusquedasControl extends M.Control {
       parent: this.selectorEditorCodeMirrorTab2EL,
     })
     /* SE CREAN LOS EVENTOS */
-    this.checkboxGeomFilterEL.addEventListener('change', () => {
-      document.getElementById(this.map_.impl_.map_.values_.target).style.cursor = "crosshair";
-      if (this.checkboxGeomFilterEL.checked) {
-        this.distanceEL.disabled = false;
-        this.coordenadaXEL.disabled = false;
-        this.coordenadaYEL.disabled = false;
+    this.distanceEL.addEventListener('change', (e) => {
+      this.distance = e.target.value;
+    });
 
+    this.checkboxGeomFilterEL.addEventListener('change', () => {
+      if (this.checkboxGeomFilterEL.checked) {
+        document.getElementById(this.map_.impl_.map_.values_.target).style.cursor = "crosshair";
         this.map_.on(M.evt.CLICK, (e) => {
           this.coordenadaXEL.value = e.coord[0].toFixed(2);
           this.coordenadaYEL.value = e.coord[1].toFixed(2);
@@ -205,21 +208,14 @@ export default class GeobusquedasControl extends M.Control {
               coordinates: e.coord
             }
           });
-          miFeature.getImpl().getOLFeature().getGeometry().transform(this.map_.getProjection().code, 'EPSG:4326');      
+          miFeature.getImpl().getOLFeature().getGeometry().transform(this.map_.getProjection().code, 'EPSG:4326');
           this.lat = miFeature.getGeometry().coordinates[1];
           this.lon = miFeature.getGeometry().coordinates[0];
-          this.distance = this.distanceEL.value;
-
-          console.log(this.lat);
-          console.log(this.lon);
-          console.log(this.distance);
-
         })
       } else {
-        this.distanceEL.disabled = true;
-        this.coordenadaXEL.disabled = true;
-        this.coordenadaYEL.disabled = true;
         document.getElementById(this.map_.impl_.map_.values_.target).style.cursor = "alias";
+        this.coordenadaXEL.value='';
+        this.coordenadaYEL.value='';
       }
     });
 
@@ -243,6 +239,15 @@ export default class GeobusquedasControl extends M.Control {
       this.getFields(indice);
     })
     this.selectorCamposTab1EL.addEventListener('change', () => {
+      this.choicesSelectorCamposFiltrosTab1EL.enable();
+      this.activeDistancePanel();
+      if (this.choicesSelectorCamposTab1EL.getValue(true).length >= 1 & this.sliderEL.classList.contains('disabled')) {
+        this.sliderEL.classList.remove('disabled');
+      } else if (this.choicesSelectorCamposTab1EL.getValue(true).length == 0) {
+        this.sliderEL.classList.add('disabled');
+        this.checkboxGeomFilterEL.checked = false;
+        document.getElementById(this.map_.impl_.map_.values_.target).style.cursor = "alias";
+      }
       this.loadButtonEL.disabled = false;
       this.clearButtonEL.disabled = false;
     })
@@ -264,6 +269,8 @@ export default class GeobusquedasControl extends M.Control {
       this.search();
     })
     this.clearButtonEL.addEventListener('click', () => {
+      document.getElementById(this.map_.impl_.map_.values_.target).style.cursor = "alias";
+      this.cleanSpatialFilter();
       this.choicesSelectorIndicesTab1EL.destroy();
       this.choicesSelectorCamposTab1EL.destroy();
       this.choicesSelectorCamposFiltrosTab1EL.destroy();
@@ -275,6 +282,7 @@ export default class GeobusquedasControl extends M.Control {
       this.choicesSelectorCamposFiltrosTab1EL.disable();
       this.removeAllChildNodes(this.filtersOptionsEL);
       this.showHideFilters();
+      this.showHideFilterGeom();
       this.fieldFilterList = new Array();
       this.choicesSelectorIndicesTab2EL.destroy();
       this.choicesSelectorIndicesTab2EL = new Choices(this.selectorIndicesTab2EL, { allowHTML: true, placeholderValue: 'Seleccione un indice', placeholder: true, searchPlaceholderValue: 'Seleccione un indice', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true });
@@ -355,7 +363,6 @@ export default class GeobusquedasControl extends M.Control {
       this.choicesSelectorCamposFiltrosTab1EL.setChoices(options, 'value', 'label', true);
       //activo los choices de los campos 
       this.choicesSelectorCamposTab1EL.enable();
-      this.choicesSelectorCamposFiltrosTab1EL.enable();
     })
   }
 
@@ -367,7 +374,8 @@ export default class GeobusquedasControl extends M.Control {
     let my_request = {
       "query": {
         "bool": {
-          "must": []
+          "must": [],
+          "filter": []
         }
       },
       "_source": {
@@ -401,6 +409,23 @@ export default class GeobusquedasControl extends M.Control {
     my_request['query']['bool']['must'] = must;
     my_request['_source']['includes'] = campos;
 
+    if (this.lat && this.lon) {
+      this.geo_distance_filter = {
+        "geo_distance": {
+          "distance": this.distance + 'km',
+          "geom": {
+            "lat": this.lat,
+            "lon": this.lon
+          }
+        }
+      }
+      my_request['query']['bool']['filter'] = this.geo_distance_filter
+    } else {
+      delete my_request.filter
+    }
+
+    console.log(my_request)
+
     switch (this.activePanel) {
       case 1:
         indice = this.choicesSelectorIndicesTab1EL.getValue(true);
@@ -409,7 +434,6 @@ export default class GeobusquedasControl extends M.Control {
       case 2:
         indice = this.choicesSelectorIndicesTab2EL.getValue(true);
         my_request = JSON.parse(this.editor.state.doc.toString())
-        // campos = new Array();
         break;
     }
     let capaGeoJSON
@@ -734,5 +758,28 @@ export default class GeobusquedasControl extends M.Control {
 
   checkfieldFilterList(fieldName) {
     this.fieldFilterList = this.fieldFilterList.filter(element => element.field != fieldName);
+  }
+
+  activeDistancePanel() {
+    this.checkboxGeomFilterEL.disabled = false;
+    this.sliderEL.classList.toggle('disabled');
+    this.sliderEL.disabled = false;
+    this.distanceEL.disabled = false;
+    this.coordenadaXEL.disabled = false;
+    this.coordenadaYEL.disabled = false;
+    this.distance = this.distanceEL.value
+  }
+
+  cleanSpatialFilter() {
+    this.checkboxGeomFilterEL.disabled = true;
+    this.checkboxGeomFilterEL.checked = false;
+    this.sliderEL.classList.toggle('disabled');
+    this.distanceEL.disabled = true;
+    this.distanceEL.value = 50;
+    this.distanceOutputEL.value = '50Km';
+    this.coordenadaXEL.disabled = true;
+    this.coordenadaYEL.disabled = true;
+    this.coordenadaXEL.value = null
+    this.coordenadaYEL.value = null;
   }
 }
