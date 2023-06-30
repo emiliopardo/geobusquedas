@@ -40,7 +40,7 @@
               <label class="switcherActiveGeomFilter"
                 title="Al activar el filtro se podrán capturar las coordenadas x,y del centro">
                 <input id="checkboxGeomFilter" type="checkbox" disabled>
-                <span class="slider round disabled" ></span>
+                <span class="slider round disabled"></span>
               </label>
               <div id="coordinates-container">
                 <label for="coordenada_x" class="label-opciones-busqueda">Coordenada X:</label><input id="coordenada_x"
@@ -54,9 +54,19 @@
                   oninput="this.nextElementSibling.value = ' '+this.value+'Km'" disabled>
                 <output id="distance_value">25Km</output>
               </div>
-              <span class="info-opciones">* Al activar la captura de coordenadas al hacer click en el mapa se copiaran las
+              <span class="info-opciones">* Al activar la captura de coordenadas al hacer click en el mapa se copiaran
+                las
                 coordendas X e Y</span>
             </div>
+          </div>
+          <div id="color">
+            <label for="firstColor">Color inicial</label>
+            <input id="firstColor" type="color" value="#ffffb2">
+            <label for="lastColor">Color final</label>
+            <input id="lastColor" type="color" value="#b10026">
+            <input type="radio" id="JENKS" name="quantification" value="JENKS" checked=true> JENKS
+            <input type="radio" id="QUANTILE" name="quantification" value="QUANTILE"> QUANTILE
+            <input id="breaks" type="number" value=5 min=1 max=8 />
           </div>
         </div>
         <div id="content-tab2">
