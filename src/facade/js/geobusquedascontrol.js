@@ -32,6 +32,8 @@ export default class GeobusquedasControl extends M.Control {
     // 2. implementation of this control
     const impl = new GeobusquedasImplControl();
     super(impl, 'Geobusquedas');
+    //Número maximo de documentos devueltos por elastic
+    this.MAX_QUERY_SIZE = 10000;
     this.IndexsListoptions = new Array();
     this.config_ = config;
     this.activePanel = 1;
@@ -40,8 +42,19 @@ export default class GeobusquedasControl extends M.Control {
     this.lat;
     this.lon;
     this.geo_distance_filter;
-    //Número maximo de documentos devueltos por elastic
-    this.MAX_QUERY_SIZE = 10000;
+    this.my_request = {
+      "query": {
+        "bool": {
+          "must": [],
+          "filter": []
+        }
+      },
+      "_source": {
+        "includes": []
+      },
+      "size": this.MAX_QUERY_SIZE,
+    }
+
 
     //Configuracion de CodeMirror
     this.startState_ = EditorState.create({
@@ -197,25 +210,10 @@ export default class GeobusquedasControl extends M.Control {
     this.checkboxGeomFilterEL.addEventListener('change', () => {
       if (this.checkboxGeomFilterEL.checked) {
         document.getElementById(this.map_.impl_.map_.values_.target).style.cursor = "crosshair";
-        this.map_.on(M.evt.CLICK, (e) => {
-          this.coordenadaXEL.value = e.coord[0].toFixed(2);
-          this.coordenadaYEL.value = e.coord[1].toFixed(2);
-
-          var miFeature = new M.Feature("featurePrueba001", {
-            type: "Feature",
-            geometry: {
-              type: "Point",
-              coordinates: e.coord
-            }
-          });
-          miFeature.getImpl().getOLFeature().getGeometry().transform(this.map_.getProjection().code, 'EPSG:4326');
-          this.lat = miFeature.getGeometry().coordinates[1];
-          this.lon = miFeature.getGeometry().coordinates[0];
-        })
-      } else {
+        this.map_.on(M.evt.CLICK, this.activeClick())
+      } else if (!this.checkboxGeomFilterEL.checked) {
         document.getElementById(this.map_.impl_.map_.values_.target).style.cursor = "alias";
-        this.coordenadaXEL.value='';
-        this.coordenadaYEL.value='';
+        this.map_.un(M.evt.CLICK, this.activeClick())
       }
     });
 
@@ -269,6 +267,18 @@ export default class GeobusquedasControl extends M.Control {
       this.search();
     })
     this.clearButtonEL.addEventListener('click', () => {
+      this.my_request = {
+        "query": {
+          "bool": {
+            "must": [],
+            "filter": []
+          }
+        },
+        "_source": {
+          "includes": []
+        },
+        "size": this.MAX_QUERY_SIZE,
+      }
       document.getElementById(this.map_.impl_.map_.values_.target).style.cursor = "alias";
       this.cleanSpatialFilter();
       this.choicesSelectorIndicesTab1EL.destroy();
@@ -291,12 +301,7 @@ export default class GeobusquedasControl extends M.Control {
       this.editor.setState(this.startState_);
       this.loadButtonEL.disabled = true;
       this.clearButtonEL.disabled = true;
-      let layerList = this.map_.getLayers()
-      layerList.forEach(layer => {
-        if (layer.name == this.indice) {
-          this.map_.removeLayers(layer)
-        }
-      });
+      this.removeOverlayLayers();
     })
   }
 
@@ -358,6 +363,8 @@ export default class GeobusquedasControl extends M.Control {
           options.push(option);
         }
       })
+      this.choicesSelectorCamposTab1EL.destroy()
+      this.choicesSelectorCamposTab1EL = new Choices(this.selectorCamposTab1EL, { allowHTML: true, placeholderValue: 'Seleccione un campo', placeholder: true, searchPlaceholderValue: 'Seleccione un campo', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true, removeItems: true, removeItemButton: true, });
       //reseteo los cohices de los campos
       this.choicesSelectorCamposTab1EL.setChoices(options, 'value', 'label', true);
       this.choicesSelectorCamposFiltrosTab1EL.setChoices(options, 'value', 'label', true);
@@ -371,18 +378,6 @@ export default class GeobusquedasControl extends M.Control {
     let campos = this.choicesSelectorCamposTab1EL.getValue(true);
     let must = new Array()
     campos.push('geom');
-    let my_request = {
-      "query": {
-        "bool": {
-          "must": [],
-          "filter": []
-        }
-      },
-      "_source": {
-        "includes": []
-      },
-      "size": this.MAX_QUERY_SIZE,
-    }
     if (this.filtersOptionsEL.hasChildNodes()) {
       this.createFilterQuery(this.filtersOptionsEL.childNodes);
     }
@@ -406,8 +401,8 @@ export default class GeobusquedasControl extends M.Control {
       }
     });
 
-    my_request['query']['bool']['must'] = must;
-    my_request['_source']['includes'] = campos;
+    this.my_request['query']['bool']['must'] = must;
+    this.my_request['_source']['includes'] = campos;
 
     if (this.lat && this.lon) {
       this.geo_distance_filter = {
@@ -419,34 +414,29 @@ export default class GeobusquedasControl extends M.Control {
           }
         }
       }
-      my_request['query']['bool']['filter'] = this.geo_distance_filter
+      this.my_request['query']['bool']['filter'] = this.geo_distance_filter
     } else {
-      delete my_request.filter
+      delete this.my_request.filter
     }
 
-    console.log(my_request)
+    console.log(this.my_request)
 
     switch (this.activePanel) {
       case 1:
         indice = this.choicesSelectorIndicesTab1EL.getValue(true);
-        this.editor.dispatch({ changes: { from: 0, to: this.editor.state.doc.length, insert: JSON.stringify(my_request, null, 2) } });
+        this.editor.dispatch({ changes: { from: 0, to: this.editor.state.doc.length, insert: JSON.stringify(this.my_request, null, 2) } });
         break;
       case 2:
         indice = this.choicesSelectorIndicesTab2EL.getValue(true);
-        my_request = JSON.parse(this.editor.state.doc.toString())
+        this.my_request = JSON.parse(this.editor.state.doc.toString())
         break;
     }
     let capaGeoJSON
     M.proxy(false);
     let url = this.config_.url + '/' + indice + '/search?'
 
-    M.remote.post(url, my_request).then((res) => {
-      let layerList = this.map_.getLayers()
-      layerList.forEach(layer => {
-        if (layer.name == indice) {
-          this.map_.removeLayers(layer)
-        }
-      });
+    M.remote.post(url, this.my_request).then((res) => {
+      this.removeOverlayLayers();
 
 
       let Arrayfeatures = new Array()
@@ -771,6 +761,8 @@ export default class GeobusquedasControl extends M.Control {
   }
 
   cleanSpatialFilter() {
+    this.lat = null;
+    this.lon = null;
     this.checkboxGeomFilterEL.disabled = true;
     this.checkboxGeomFilterEL.checked = false;
     this.sliderEL.classList.toggle('disabled');
@@ -781,5 +773,33 @@ export default class GeobusquedasControl extends M.Control {
     this.coordenadaYEL.disabled = true;
     this.coordenadaXEL.value = null
     this.coordenadaYEL.value = null;
+  }
+
+  removeOverlayLayers() {
+    let layerList = this.map_.getLayers()
+    layerList.forEach(layer => {
+      if (layer instanceof M.layer.Vector && layer.name != '__draw__') {
+        this.map_.removeLayers(layer)
+      }
+    });
+  }
+
+  activeClick() {
+    this.map_.on(M.evt.CLICK, (e) => {
+      if (this.checkboxGeomFilterEL.checked) {
+        this.coordenadaXEL.value = e.coord[0].toFixed(2);
+        this.coordenadaYEL.value = e.coord[1].toFixed(2);
+        var miFeature = new M.Feature("featurePrueba001", {
+          type: "Feature",
+          geometry: {
+            type: "Point",
+            coordinates: e.coord
+          }
+        });
+        miFeature.getImpl().getOLFeature().getGeometry().transform(this.map_.getProjection().code, 'EPSG:4326');
+        this.lat = miFeature.getGeometry().coordinates[1];
+        this.lon = miFeature.getGeometry().coordinates[0];
+      }
+    })
   }
 }
