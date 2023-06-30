@@ -470,7 +470,13 @@ export default class GeobusquedasControl extends M.Control {
           name: indice
         });
 
-        capaGeoJSON.setStyle(this.estilo);
+        let colorInicial = document.getElementById("firstColor").value;
+        let colorFinal = document.getElementById("lastColor").value;
+        let breaks = document.getElementById("breaks").value;
+        let quantification = document.getElementById("JENKS").checked ? M.style.quantification.JENKS(breaks) : M.style.quantification.QUANTILE(breaks);
+        let choropleth = new M.style.Choropleth(campos[1], [this.addAlpha(colorInicial,0.5), this.addAlpha(colorFinal,0.5)], quantification);
+        capaGeoJSON.setStyle(choropleth);
+        // capaGeoJSON.setStyle(this.estilo);
 
         this.map_.addLayers(capaGeoJSON);
         capaGeoJSON.on(M.evt.LOAD, () => {
@@ -802,4 +808,10 @@ export default class GeobusquedasControl extends M.Control {
       }
     })
   }
+
+  addAlpha(color, opacity) {
+    // coerce values so ti is between 0 and 1.
+    var _opacity = Math.round(Math.min(Math.max(opacity || 1, 0), 1) * 255);
+    return color + _opacity.toString(16).toUpperCase();
+}
 }
