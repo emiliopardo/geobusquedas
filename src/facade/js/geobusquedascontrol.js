@@ -508,7 +508,6 @@ export default class GeobusquedasControl extends M.Control {
         
         capaGeoJSON.setStyle(choropleth);
         // capaGeoJSON.setStyle(this.estilo);
-
         // console.log(choropleth['choroplethStyles_']);
         this.map_.addLayers(capaGeoJSON);
         capaGeoJSON.on(M.evt.LOAD, () => {
@@ -796,7 +795,7 @@ export default class GeobusquedasControl extends M.Control {
         let option = {
           value: element,
           label: element,
-          selected: true,
+          selected: false,
           disabled: false,
         }
         options.push(option);    
