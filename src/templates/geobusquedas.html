@@ -59,14 +59,35 @@
                 coordendas X e Y</span>
             </div>
           </div>
-          <div id="color">
-            <label for="firstColor">Color inicial</label>
-            <input id="firstColor" type="color" value="#ffffb2">
-            <label for="lastColor">Color final</label>
-            <input id="lastColor" type="color" value="#b10026">
-            <input type="radio" id="JENKS" name="quantification" value="JENKS" checked=true> JENKS
-            <input type="radio" id="QUANTILE" name="quantification" value="QUANTILE"> QUANTILE
-            <input id="breaks" type="number" value=5 min=1 max=8 />
+          <div id="styles" class="opciones-busqueda">
+            <label id="label-styles" class="label-filters"><i class="g-cartografia-mas2"></i>&#32;&#32;Simbología
+              Avanzada</label>
+            <div id="advanced-symbology-container">
+              <div id="representation-field-container">
+                <label class="label-opciones-busqueda" for="selectorRepresentationField">Campo de Representación</label>
+                <select id="selectorRepresentationField" name="selectorRepresentationField" default-label="Campos">
+                  <option>Selecciona un campo</option>
+                </select>
+              </div>
+              <div class="colorSelector">
+                <label for="firstColor" class="label-opciones-busqueda">Color inicial</label>
+                <input id="firstColor" type="color" value="#ffffb2">
+              </div>
+              <div class="colorSelector">
+                <label for="lastColor" class="label-opciones-busqueda">Color final</label>
+                <input id="lastColor" type="color" value="#b10026">
+              </div>
+              <div class="classification-method">
+              <label class="label-opciones-busqueda">Método de clasificación</label>
+              <input type="radio" id="JENKS" name="quantification" value="JENKS" checked=true> JENKS
+              <input type="radio" id="QUANTILE" name="quantification" value="QUANTILE"> QUANTILE
+              </div>
+              <div class="classification-ranges">
+              <label class="label-opciones-busqueda">Intervalos</label>
+              <input id="breaks" type="number" value=5 min=1 max=8 />
+              </div>
+            </div>
+            </div>
           </div>
         </div>
         <div id="content-tab2">
