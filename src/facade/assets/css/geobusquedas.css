@@ -98,8 +98,8 @@ div.m-geobusquedas-title {
   color: #fff;
 }
 
-div#m-geobusquedas-tab{
-    border-bottom: 1px solid #ddd;
+div#m-geobusquedas-tab {
+  border-bottom: 1px solid #ddd;
 }
 
 /* Estilo labels tab */
@@ -175,6 +175,7 @@ div.opciones-busqueda {
   display: block;
 }
 
+#advanced-symbology-container,
 #filter-container,
 #filter-geom-container {
   display: none;
@@ -184,6 +185,32 @@ div.opciones-busqueda {
   padding-bottom: 10px;
   border-bottom-left-radius: 2.5px;
   border-bottom-right-radius: 2.5px;
+}
+
+div.colorSelector,
+div.classification-ranges,
+div.classification-method {
+  margin-top: 5px;
+  display: inline-block;
+  width: 48%;
+}
+
+input[type=color] {
+  margin-left: 5px;
+  border: 1px solid #ddd !important;
+  border-radius: 2.5px !important;
+}
+
+input[type=number]#breaks {
+  margin-left: 5px;
+  font-size: 10px;
+  color: #6c6c6c;
+  display: inline-block;
+  vertical-align: top !important;
+  background-color: #f9f9f9 !important;
+  padding: 7.5px 7.5px 3.75px !important;
+  border: 1px solid #ddd !important;
+  border-radius: 2.5px !important;
 }
 
 label {
@@ -533,6 +560,6 @@ input[type=checkbox]:checked+.slider:before {
   width: 48%;
 }
 
-.disabled{
+.disabled {
   cursor: not-allowed;
 }
