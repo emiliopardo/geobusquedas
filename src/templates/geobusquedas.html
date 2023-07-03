@@ -6,24 +6,27 @@
     <div class="m-geobusquedas-body">
       <div id="m-geobusquedas-content">
         <div id="m-geobusquedas-tab">
-          <label id="tab1" class="m-geobusquedas-tab actived">Básico</label>
-          <label id="tab2" class="m-geobusquedas-tab">Avanzado</label>
+          <label id="tab1" class="m-geobusquedas-tab actived"
+            title="Muestra / Oculta panel básico de búsquedas">Básico</label>
+          <label id="tab2" class="m-geobusquedas-tab"
+            title="Muestra / Oculta panel avanzado de búsquedas">Avanzado</label>
         </div>
         <div id="content-tab1">
-          <div id="indices" class="opciones-busqueda">
+          <div id="indices" class="opciones-busqueda" title="Selector de Índices">
             <label class="label-opciones-busqueda" for="selectorIndices-tab1">Indices</label>
             <select id="selectorIndices-tab1" name="selectorIndices-tab1" default-label="Indices">
             </select>
           </div>
-          <div id="campos" class="opciones-busqueda">
+          <div id="campos" class="opciones-busqueda" title="Selector de Campos">
             <label class="label-opciones-busqueda" for="selectorCampos">Campos</label>
             <select id="selectorCampos" name="selectorCampos" default-label="Campos" multiple>
             </select>
           </div>
           <div id="filtros" class="opciones-busqueda">
-            <label id="label-filters" class="label-filters"><i class="g-cartografia-mas2"></i>&#32;&#32;Filtro
+            <label id="label-filters" class="label-filters" title="Mostrar / Ocultar Filtro Temático"><i
+                class="g-cartografia-mas2"></i>&#32;&#32;Filtro
               Temático</label>
-            <div id="filter-container">
+            <div id="filter-container" title="Filtro Temático">
               <label class="label-opciones-busqueda" for="selectorCamposFiltros">Campos</label>
               <select id="selectorCamposFiltros" name="selectorCamposFiltros" default-label="Campos" multiple>
               </select>
@@ -32,9 +35,10 @@
             </div>
           </div>
           <div id="geom" name="geom" class="opciones-busqueda">
-            <label id="label-filter-geom" class="label-filters"><i class="g-cartografia-mas2"></i>&#32;&#32;Filtro
+            <label id="label-filter-geom" class="label-filters" title="Mostrar / Ocultar Filtro Espacial"><i
+                class="g-cartografia-mas2"></i>&#32;&#32;Filtro
               Espacial</label>
-            <div id="filter-geom-container">
+            <div id="filter-geom-container" title="Filtro Espacial">
               <label class="label-opciones-busqueda" for="filtro_geom" id="label_filtro_geom">Activar / Desactivar
                 Captura de Coordenadas</label>
               <label class="switcherActiveGeomFilter"
@@ -44,11 +48,11 @@
               </label>
               <div id="coordinates-container">
                 <label for="coordenada_x" class="label-opciones-busqueda">Coordenada X:</label><input id="coordenada_x"
-                  name="coordenada_x" class="inputFilterGeom" type="number" disabled>
+                  name="coordenada_x" class="inputFilterGeom" type="number" title="Coordenada X (longitud)" disabled>
                 <label for="coordenada_y" class="label-opciones-busqueda">Coordenada Y:</label><input id="coordenada_y"
-                  name="coordenada_y" class="inputFilterGeom" type="number" disabled>
+                  name="coordenada_y" class="inputFilterGeom" type="number" title="Coordenada Y (latitud)" disabled>
               </div>
-              <div id="range-container">
+              <div id="range-container" title="Distancia en kilómetros del radio">
                 <label for="distance" class="label-opciones-busqueda">Radio (entre 1 y 50 km):</label>
                 <input type="range" id="distance" name="distance" min="1" max="50" value="25"
                   oninput="this.nextElementSibling.value = ' '+this.value+'Km'" disabled>
@@ -60,7 +64,8 @@
             </div>
           </div>
           <div id="styles" class="opciones-busqueda">
-            <label id="label-styles" class="label-filters"><i class="g-cartografia-mas2"></i>&#32;&#32;Simbología
+            <label id="label-styles" class="label-filters" title="Mostrar / Ocultar Simbología Avanzada"><i
+                class="g-cartografia-mas2"></i>&#32;&#32;Simbología
               Avanzada</label>
             <div id="advanced-symbology-container">
               <div id="representation-field-container">
@@ -69,42 +74,37 @@
                   <option>Selecciona un campo</option>
                 </select>
               </div>
-              <div class="colorSelector">
+              <div class="colorSelector" title="Selecionar Color Incial">
                 <label for="firstColor" class="label-opciones-busqueda">Color inicial</label>
-                <input id="firstColor" type="color" value="#ffffb2">
+                <input id="firstColor" type="color" value="#ffffb2" disabled>
               </div>
-              <div class="colorSelector">
+              <div class="colorSelector" title="Selecionar Color Final">
                 <label for="lastColor" class="label-opciones-busqueda">Color final</label>
-                <input id="lastColor" type="color" value="#b10026">
+                <input id="lastColor" type="color" value="#b10026" disabled>
               </div>
-              <div class="classification-method">
-              <label class="label-opciones-busqueda">Método de clasificación</label>
-              <input type="radio" id="JENKS" name="quantification" value="JENKS" checked=true> JENKS
-              <input type="radio" id="QUANTILE" name="quantification" value="QUANTILE"> QUANTILE
+              <div class="classification-method" title="Método de Clasificación">
+                <label class="label-opciones-busqueda">Método de clasificación</label>
+                <input type="radio" id="JENKS" name="quantification" value="JENKS" checked=true> JENKS
+                <input type="radio" id="QUANTILE" name="quantification" value="QUANTILE"> QUANTILE
               </div>
-              <div class="classification-ranges">
-              <label class="label-opciones-busqueda">Intervalos</label>
-              <input id="breaks" type="number" value=5 min=1 max=8 />
+              <div class="classification-ranges" title="Número de Intervalos">
+                <label class="label-opciones-busqueda">Número de Intervalos</label>
+                <input id="breaks" type="number" value=5 min=1 max=7 disabled />
               </div>
-            </div>
             </div>
           </div>
         </div>
         <div id="content-tab2">
-          <div id="indices" class="opciones-busqueda">
+          <div id="indices" class="opciones-busqueda" title="Selector de Índices">
             <label class="label-opciones-busqueda" for="selectorIndices-tab2">Indices</label>
             <select id="selectorIndices-tab2" name="selectorIndices-tab2" default-label="Indices">
             </select>
           </div>
-          <div id="editor" class="opciones-busqueda">
+          <div id="editor" class="opciones-busqueda" title="Editor avanzado de búsquedas">
             <label class="label-opciones-busqueda" for="editorCodeMirror">Editor JSON</label>
             <div id="editorCodeMirror"></div>
           </div>
         </div>
-      </div>
-      <div id="m-geobusquedas-result-content" class="results">
-      </div>
-      <div id="m-geobusquedas-result-pagination" class="page">
       </div>
       <div id="m-geobusquedas-buttons">
         <button id="loadButton" class="load" disabled="disabled" title="Ejecutar">
