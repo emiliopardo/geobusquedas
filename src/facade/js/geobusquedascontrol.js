@@ -164,59 +164,64 @@ export default class GeobusquedasControl extends M.Control {
   // Add your own functions
 
   addEvents(html) {
+    /******************************/
     /* SE ACCEDE A LOS SELECTORES */
+    /******************************/
+    /* pestañas del panel */
     this.panelTab1El = html.querySelectorAll('#tab1')[0];
     this.panelTab2El = html.querySelectorAll('#tab2')[0];
+    /* contenedores de cada una de las pestañas*/
     this.panelContentTab1EL = html.querySelectorAll('#content-tab1')[0];
     this.panelContentTab2EL = html.querySelectorAll('#content-tab2')[0];
+    /* contenido del contenedor de la pestaña 1 */
     this.selectorIndicesTab1EL = html.querySelectorAll('select#selectorIndices-tab1')[0];
-    this.selectorIndicesTab2EL = html.querySelectorAll('select#selectorIndices-tab2')[0];
     this.selectorCamposTab1EL = html.querySelectorAll('select#selectorCampos')[0];
+    /* filtro tematico de campos */
     this.selectorCamposFiltrosTab1EL = html.querySelectorAll('select#selectorCamposFiltros')[0];
-    this.selectorEditorCodeMirrorTab2EL = html.querySelectorAll('div#editorCodeMirror')[0];
-    this.loadButtonEL = html.querySelectorAll('button#loadButton')[0];
-    this.clearButtonEL = html.querySelectorAll('button#clearButton')[0];
-    this.filterFieldsEL = html.querySelectorAll('label#label-filters')[0];
-    this.filterGeomEL = html.querySelectorAll('label#label-filter-geom')[0];
-    this.filtersContainerEL = html.querySelectorAll('div#filter-container')[0];
-    this.filterGeomContainerEL = html.querySelectorAll('div#filter-geom-container')[0];
+    this.tematicFilterEL = html.querySelectorAll('i#tematic-filter')[0];
     this.filtersOptionsEL = html.querySelectorAll('form#filters-options')[0];
+    /* filtro espacial / geométrico*/
+    this.spatialFilterEL = html.querySelectorAll('i#spatial-filter')[0];
     this.checkboxGeomFilterEL = html.querySelectorAll('input#checkboxGeomFilter')[0];
     this.sliderEL = html.querySelectorAll('span.slider,span.round')[0];
     this.distanceEL = html.querySelectorAll('input#distance')[0];
     this.distanceOutputEL = html.querySelectorAll('output#distance_value')[0];
     this.coordenadaXEL = html.querySelectorAll('input#coordenada_x')[0];
     this.coordenadaYEL = html.querySelectorAll('input#coordenada_y')[0];
-
-    /* SE CREAN Y CONFIGURAR LOS CHOICE.JS*/
+    /* filtros estilos avanzados*/
+    this.AdvancedStyleEL = html.querySelectorAll('i#advanced-styles')[0];
+    this.selectorCampoEstiloTab1EL = html.querySelectorAll('select#selectorAdvancedStylesField')[0];
+    /* contenido del contenedor de la pestaña 2 */
+    this.selectorIndicesTab2EL = html.querySelectorAll('select#selectorIndices-tab2')[0];
+    this.selectorEditorCodeMirrorTab2EL = html.querySelectorAll('div#editorCodeMirror')[0];
+    /* botones cargar borrar*/
+    this.loadButtonEL = html.querySelectorAll('button#loadButton')[0];
+    this.clearButtonEL = html.querySelectorAll('button#clearButton')[0];
+    /***************************************/
+    /* SE CREAN Y CONFIGURAR LOS CHOICE.JS */
+    /***************************************/
     this.choicesSelectorIndicesTab1EL = new Choices(this.selectorIndicesTab1EL, { allowHTML: true, placeholderValue: 'Seleccione un indice', placeholder: true, searchPlaceholderValue: 'Seleccione un indice', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true });
     this.choicesSelectorCamposTab1EL = new Choices(this.selectorCamposTab1EL, { allowHTML: true, placeholderValue: 'Seleccione un campo', placeholder: true, searchPlaceholderValue: 'Seleccione un campo', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true, removeItems: true, removeItemButton: true, });
-    this.choicesSelectorCamposFiltrosTab1EL = new Choices(this.selectorCamposFiltrosTab1EL, { allowHTML: true, placeholderValue: 'Seleccione un campo para filtrar', placeholder: true, searchPlaceholderValue: 'Seleccione un campo', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true, removeItems: true, removeItemButton: true, });
+    this.choicesSelectorFiltrosCamposTab1EL = new Choices(this.selectorCamposFiltrosTab1EL, { allowHTML: true, placeholderValue: 'Seleccione un campo para filtrar', placeholder: true, searchPlaceholderValue: 'Seleccione un campo', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true, removeItems: true, removeItemButton: true, });
+    this.choicesSelectorCamposEstiloTab1EL = new Choices(this.selectorCampoEstiloTab1EL, { allowHTML: true, placeholderValue: 'Seleccione un campo', placeholder: true, searchPlaceholderValue: 'Seleccione un campo', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true, removeItems: true, removeItemButton: false, });
     this.choicesSelectorIndicesTab2EL = new Choices(this.selectorIndicesTab2EL, { allowHTML: true, placeholderValue: 'Seleccione un indice', placeholder: true, searchPlaceholderValue: 'Seleccione un indice', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true });
-
+    /***********************************************/
     /* INICIALIZAMOS EL CHOICE DE CAMPOS A DISABLE */
+    /***********************************************/
     this.choicesSelectorCamposTab1EL.disable();
-    this.choicesSelectorCamposFiltrosTab1EL.disable();
+    this.choicesSelectorFiltrosCamposTab1EL.disable();
+    this.choicesSelectorCamposEstiloTab1EL.disable()
+    /*******************************/
     /* CARGAMOS EDITOR CODEMIRROR  */
+    /*******************************/
     this.editor = new EditorView({
       state: this.startState_,
       parent: this.selectorEditorCodeMirrorTab2EL,
     })
-    /* SE CREAN LOS EVENTOS */
-    this.distanceEL.addEventListener('change', (e) => {
-      this.distance = e.target.value;
-    });
-
-    this.checkboxGeomFilterEL.addEventListener('change', () => {
-      if (this.checkboxGeomFilterEL.checked) {
-        document.getElementById(this.map_.impl_.map_.values_.target).style.cursor = "crosshair";
-        this.map_.on(M.evt.CLICK, this.activeClick())
-      } else if (!this.checkboxGeomFilterEL.checked) {
-        document.getElementById(this.map_.impl_.map_.values_.target).style.cursor = "alias";
-        this.map_.un(M.evt.CLICK, this.activeClick())
-      }
-    });
-
+    /************************/
+    /* CAPTURAMOS   EVENTOS */
+    /************************/
+    /* Eventos al hacer click en los tab del panel */
     this.panelTab1El.addEventListener('click', () => {
       this.activePanel = 1;
       this.panelTab1El.classList.add('actived');
@@ -231,14 +236,16 @@ export default class GeobusquedasControl extends M.Control {
       this.panelContentTab1EL.style.display = 'none';
       this.panelContentTab2EL.style.display = 'block';
     })
-
+    /* evento al cambiar el selector selectorIndicesTab1EL */
     this.selectorIndicesTab1EL.addEventListener('change', () => {
       let indice = this.choicesSelectorIndicesTab1EL.getValue(true);
       this.getFields(indice);
     })
+    /* evento al cambiar el selector selectorCamposTab1EL */
     this.selectorCamposTab1EL.addEventListener('change', () => {
-      this.choicesSelectorCamposFiltrosTab1EL.enable();
+      this.choicesSelectorFiltrosCamposTab1EL.enable();
       this.activeDistancePanel();
+      this.activeAvanceStylePanel();
       if (this.choicesSelectorCamposTab1EL.getValue(true).length >= 1 & this.sliderEL.classList.contains('disabled')) {
         this.sliderEL.classList.remove('disabled');
       } else if (this.choicesSelectorCamposTab1EL.getValue(true).length == 0) {
@@ -249,15 +256,36 @@ export default class GeobusquedasControl extends M.Control {
       this.loadButtonEL.disabled = false;
       this.clearButtonEL.disabled = false;
     })
-
+    /* evento al cambiar el selector selectorCamposFiltrosTab1EL */
     this.selectorCamposFiltrosTab1EL.addEventListener('change', () => {
       this.removeAllChildNodes(this.filtersOptionsEL);
-      this.createInputFilters(this.choicesSelectorCamposFiltrosTab1EL.getValue(true));
+      this.createInputFilters(this.choicesSelectorFiltrosCamposTab1EL.getValue(true));
     })
+    /* eventos al hacer click en los labels de cada uno de los tipos de opcions  Filtro Campos, Filtro Geométrico , Estilos Avanzados*/
+    this.tematicFilterEL.addEventListener('click', (e) => {
+      this.showHide(e)
+    });
+    this.spatialFilterEL.addEventListener('click', (e) => {
+      this.showHide(e)
+    });
+    this.AdvancedStyleEL.addEventListener('click', (e) => {
+      this.showHide(e)
+    });
 
-    this.filterFieldsEL.addEventListener('click', () => { this.showHideFilters() });
 
-    this.filterGeomEL.addEventListener('click', () => { this.showHideFilterGeom() });
+    this.distanceEL.addEventListener('change', (e) => {
+      this.distance = e.target.value;
+    });
+
+    this.checkboxGeomFilterEL.addEventListener('change', () => {
+      if (this.checkboxGeomFilterEL.checked) {
+        document.getElementById(this.map_.impl_.map_.values_.target).style.cursor = "crosshair";
+        this.map_.on(M.evt.CLICK, this.activeClick())
+      } else if (!this.checkboxGeomFilterEL.checked) {
+        document.getElementById(this.map_.impl_.map_.values_.target).style.cursor = "alias";
+        this.map_.un(M.evt.CLICK, this.activeClick())
+      }
+    });
 
     this.selectorIndicesTab2EL.addEventListener('change', () => {
       this.loadButtonEL.disabled = false;
@@ -283,16 +311,18 @@ export default class GeobusquedasControl extends M.Control {
       this.cleanSpatialFilter();
       this.choicesSelectorIndicesTab1EL.destroy();
       this.choicesSelectorCamposTab1EL.destroy();
-      this.choicesSelectorCamposFiltrosTab1EL.destroy();
+      this.choicesSelectorFiltrosCamposTab1EL.destroy();
+      this.choicesSelectorCamposEstiloTab1EL.destroy();
       this.choicesSelectorIndicesTab1EL = new Choices(this.selectorIndicesTab1EL, { allowHTML: true, placeholderValue: 'Seleccione un indice', placeholder: true, searchPlaceholderValue: 'Seleccione un indice', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true });
       this.choicesSelectorIndicesTab1EL.setChoices(this.IndexsListoptions)
       this.choicesSelectorCamposTab1EL = new Choices(this.selectorCamposTab1EL, { allowHTML: true, placeholderValue: 'Seleccione un campo', placeholder: true, searchPlaceholderValue: 'Seleccione un campo', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true, removeItems: true, removeItemButton: true, });
       this.choicesSelectorCamposTab1EL.disable();
-      this.choicesSelectorCamposFiltrosTab1EL = new Choices(this.selectorCamposFiltrosTab1EL, { allowHTML: true, placeholderValue: 'Seleccione un campo para filtrar', placeholder: true, searchPlaceholderValue: 'Seleccione un campo', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true, removeItems: true, removeItemButton: true, });
-      this.choicesSelectorCamposFiltrosTab1EL.disable();
+      this.choicesSelectorCamposEstiloTab1EL = new Choices(this.selectorCampoEstiloTab1EL, { allowHTML: true, placeholderValue: 'Seleccione un campo', placeholder: true, searchPlaceholderValue: 'Seleccione un campo', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true, removeItems: true, removeItemButton: true, });
+      this.choicesSelectorCamposEstiloTab1EL.disable();
+      this.choicesSelectorFiltrosCamposTab1EL = new Choices(this.selectorCamposFiltrosTab1EL, { allowHTML: true, placeholderValue: 'Seleccione un campo para filtrar', placeholder: true, searchPlaceholderValue: 'Seleccione un campo', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true, removeItems: true, removeItemButton: true, });
+      this.choicesSelectorFiltrosCamposTab1EL.disable();
       this.removeAllChildNodes(this.filtersOptionsEL);
-      this.showHideFilters();
-      this.showHideFilterGeom();
+      this.desActiveAvanceStylePanel();
       this.fieldFilterList = new Array();
       this.choicesSelectorIndicesTab2EL.destroy();
       this.choicesSelectorIndicesTab2EL = new Choices(this.selectorIndicesTab2EL, { allowHTML: true, placeholderValue: 'Seleccione un indice', placeholder: true, searchPlaceholderValue: 'Seleccione un indice', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true });
@@ -367,7 +397,7 @@ export default class GeobusquedasControl extends M.Control {
       this.choicesSelectorCamposTab1EL = new Choices(this.selectorCamposTab1EL, { allowHTML: true, placeholderValue: 'Seleccione un campo', placeholder: true, searchPlaceholderValue: 'Seleccione un campo', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true, removeItems: true, removeItemButton: true, });
       //reseteo los cohices de los campos
       this.choicesSelectorCamposTab1EL.setChoices(options, 'value', 'label', true);
-      this.choicesSelectorCamposFiltrosTab1EL.setChoices(options, 'value', 'label', true);
+      this.choicesSelectorFiltrosCamposTab1EL.setChoices(options, 'value', 'label', true);
       //activo los choices de los campos 
       this.choicesSelectorCamposTab1EL.enable();
     })
@@ -474,12 +504,19 @@ export default class GeobusquedasControl extends M.Control {
         let colorFinal = document.getElementById("lastColor").value;
         let breaks = document.getElementById("breaks").value;
         let quantification = document.getElementById("JENKS").checked ? M.style.quantification.JENKS(breaks) : M.style.quantification.QUANTILE(breaks);
-        let choropleth = new M.style.Choropleth(campos[1], [this.addAlpha(colorInicial,0.5), this.addAlpha(colorFinal,0.5)], quantification);
+        let choropleth = new M.style.Choropleth(this.choicesSelectorCamposEstiloTab1EL.getValue(true), [colorInicial, colorFinal], quantification);
+        
         capaGeoJSON.setStyle(choropleth);
         // capaGeoJSON.setStyle(this.estilo);
 
+        // console.log(choropleth['choroplethStyles_']);
         this.map_.addLayers(capaGeoJSON);
         capaGeoJSON.on(M.evt.LOAD, () => {
+          capaGeoJSON.getFeatures().forEach(function (f) {
+            if (f.getStyle()) {
+              f.getStyle().set("polygon.fill.opacity", 0.7);
+            }
+          });
           this.map_.setBbox(capaGeoJSON.getMaxExtent())
         })
       } else {
@@ -682,29 +719,14 @@ export default class GeobusquedasControl extends M.Control {
     })
   }
 
-  showHideFilterGeom() {
-    {
-      let myIcon = this.filterGeomEL.firstChild
-      myIcon.classList.toggle('g-cartografia-mas2')
-      myIcon.classList.toggle('g-cartografia-menos2')
-      if (myIcon.classList.contains('g-cartografia-menos2')) {
-        this.filterGeomContainerEL.style.display = 'block'
-      } else {
-        this.filterGeomContainerEL.style.display = 'none'
-      }
-    }
-  }
-
-  showHideFilters() {
-    {
-      let myIcon = this.filterFieldsEL.firstChild
-      myIcon.classList.toggle('g-cartografia-mas2')
-      myIcon.classList.toggle('g-cartografia-menos2')
-      if (myIcon.classList.contains('g-cartografia-menos2')) {
-        this.filtersContainerEL.style.display = 'block'
-      } else {
-        this.filtersContainerEL.style.display = 'none'
-      }
+  showHide(event) {
+    event.currentTarget.classList.toggle('g-cartografia-mas2');
+    event.currentTarget.classList.toggle('g-cartografia-menos2');
+    let my_container_filter_element = document.getElementById(event.currentTarget.getAttribute('name') + '-container');
+    if (event.currentTarget.classList.contains('g-cartografia-menos2')) {
+      document.getElementById(my_container_filter_element.getAttribute('id')).style.display = 'block'
+    } else {
+      document.getElementById(my_container_filter_element.getAttribute('id')).style.display = 'none'
     }
   }
 
@@ -754,6 +776,52 @@ export default class GeobusquedasControl extends M.Control {
 
   checkfieldFilterList(fieldName) {
     this.fieldFilterList = this.fieldFilterList.filter(element => element.field != fieldName);
+  }
+
+  activeAvanceStylePanel() {
+    let options = new Array()
+    let selectFields = this.choicesSelectorCamposTab1EL.getValue(true);
+    if(selectFields.length==1){
+      selectFields.forEach(element => {
+        let option = {
+          value: element,
+          label: element,
+          selected: true,
+          disabled: false,
+        }
+        options.push(option);
+      })
+    }else{
+      selectFields.forEach(element => {
+        let option = {
+          value: element,
+          label: element,
+          selected: true,
+          disabled: false,
+        }
+        options.push(option);    
+      });
+
+    }
+  
+    this.choicesSelectorCamposEstiloTab1EL.destroy();
+    this.choicesSelectorCamposEstiloTab1EL = new Choices(this.selectorCampoEstiloTab1EL, { allowHTML: true, placeholderValue: 'Seleccione un campo', placeholder: true, searchPlaceholderValue: 'Seleccione un campo', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true, removeItems: true, removeItemButton: false, });
+    this.choicesSelectorCamposEstiloTab1EL.setChoices(options);
+    this.choicesSelectorCamposEstiloTab1EL.enable();
+    document.getElementById('firstColor').disabled = false;
+    document.getElementById('lastColor').disabled = false;
+    document.getElementById('breaks').disabled = false;
+  }
+
+
+  desActiveAvanceStylePanel() {
+    this.choicesSelectorCamposEstiloTab1EL.clearChoices();
+    this.choicesSelectorCamposEstiloTab1EL.disable();
+
+    document.getElementById('firstColor').disabled = true;
+    document.getElementById('lastColor').disabled = true;
+    document.getElementById('breaks').disabled = true;
+
   }
 
   activeDistancePanel() {
@@ -808,10 +876,4 @@ export default class GeobusquedasControl extends M.Control {
       }
     })
   }
-
-  addAlpha(color, opacity) {
-    // coerce values so ti is between 0 and 1.
-    var _opacity = Math.round(Math.min(Math.max(opacity || 1, 0), 1) * 255);
-    return color + _opacity.toString(16).toUpperCase();
-}
 }
