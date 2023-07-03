@@ -24,9 +24,9 @@
           </div>
           <div id="filtros" class="opciones-busqueda">
             <label id="label-filters" class="label-filters" title="Mostrar / Ocultar Filtro Temático"><i
-                class="g-cartografia-mas2"></i>&#32;&#32;Filtro
+                class="g-cartografia-mas2" id="tematic-filter" name="tematic-filter"></i>&#32;&#32;Filtro
               Temático</label>
-            <div id="filter-container" title="Filtro Temático">
+            <div id="tematic-filter-container" title="Filtro Temático">
               <label class="label-opciones-busqueda" for="selectorCamposFiltros">Campos</label>
               <select id="selectorCamposFiltros" name="selectorCamposFiltros" default-label="Campos" multiple>
               </select>
@@ -36,9 +36,9 @@
           </div>
           <div id="geom" name="geom" class="opciones-busqueda">
             <label id="label-filter-geom" class="label-filters" title="Mostrar / Ocultar Filtro Espacial"><i
-                class="g-cartografia-mas2"></i>&#32;&#32;Filtro
+                class="g-cartografia-mas2" id="spatial-filter" name="spatial-filter"></i>&#32;&#32;Filtro
               Espacial</label>
-            <div id="filter-geom-container" title="Filtro Espacial">
+            <div id="spatial-filter-container" title="Filtro Espacial">
               <label class="label-opciones-busqueda" for="filtro_geom" id="label_filtro_geom">Activar / Desactivar
                 Captura de Coordenadas</label>
               <label class="switcherActiveGeomFilter"
@@ -65,12 +65,12 @@
           </div>
           <div id="styles" class="opciones-busqueda">
             <label id="label-styles" class="label-filters" title="Mostrar / Ocultar Simbología Avanzada"><i
-                class="g-cartografia-mas2"></i>&#32;&#32;Simbología
+                class="g-cartografia-mas2" id="advanced-styles" name="advanced-styles"></i>&#32;&#32;Simbología
               Avanzada</label>
-            <div id="advanced-symbology-container">
-              <div id="representation-field-container">
-                <label class="label-opciones-busqueda" for="selectorRepresentationField">Campo de Representación</label>
-                <select id="selectorRepresentationField" name="selectorRepresentationField" default-label="Campos">
+            <div id="advanced-styles-container">
+              <div id="advanced-styles-field-container">
+                <label class="label-opciones-busqueda" for="selectorAdvancedStylesField">Campo de Representación</label>
+                <select id="selectorAdvancedStylesField" name="selectorAdvancedStylesField" default-label="Campos">
                   <option>Selecciona un campo</option>
                 </select>
               </div>
