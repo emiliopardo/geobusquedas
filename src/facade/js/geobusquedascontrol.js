@@ -500,22 +500,54 @@ export default class GeobusquedasControl extends M.Control {
           name: indice
         });
 
+        M.style.Choropleth.DEFAULT_STYLE = function (c) {
+          return new M.style.Generic({
+            point: {
+              fill: {
+                color: c,
+                opacity: 1,
+              },
+              stroke: {
+                color: '#6c6c6c',
+                width: 0.5,
+              },
+              radius: 5,
+            },
+            line: {
+              stroke: {
+                color: c,
+                width: 1,
+              },
+            },
+            polygon: {
+              fill: {
+                color: c,
+                opacity: 0.7,
+              },
+              stroke: {
+                color: '#6c6c6c',
+                width: 0.5,
+              },
+            },
+          });
+        };
+
         let colorInicial = document.getElementById("firstColor").value;
         let colorFinal = document.getElementById("lastColor").value;
         let breaks = document.getElementById("breaks").value;
         let quantification = document.getElementById("JENKS").checked ? M.style.quantification.JENKS(breaks) : M.style.quantification.QUANTILE(breaks);
         let choropleth = new M.style.Choropleth(this.choicesSelectorCamposEstiloTab1EL.getValue(true), [colorInicial, colorFinal], quantification);
-        
+
         capaGeoJSON.setStyle(choropleth);
         // capaGeoJSON.setStyle(this.estilo);
         // console.log(choropleth['choroplethStyles_']);
         this.map_.addLayers(capaGeoJSON);
         capaGeoJSON.on(M.evt.LOAD, () => {
-          capaGeoJSON.getFeatures().forEach(function (f) {
-            if (f.getStyle()) {
-              f.getStyle().set("polygon.fill.opacity", 0.7);
-            }
-          });
+          // capaGeoJSON.getFeatures().forEach(function (f) {
+          //   if (f.getStyle()) {
+          //     f.getStyle().set("polygon.fill.opacity", 0.7);
+          //   }
+          // });
           this.map_.setBbox(capaGeoJSON.getMaxExtent())
         })
       } else {
@@ -780,7 +812,7 @@ export default class GeobusquedasControl extends M.Control {
   activeAvanceStylePanel() {
     let options = new Array()
     let selectFields = this.choicesSelectorCamposTab1EL.getValue(true);
-    if(selectFields.length==1){
+    if (selectFields.length == 1) {
       selectFields.forEach(element => {
         let option = {
           value: element,
@@ -790,7 +822,7 @@ export default class GeobusquedasControl extends M.Control {
         }
         options.push(option);
       })
-    }else{
+    } else {
       selectFields.forEach(element => {
         let option = {
           value: element,
@@ -798,11 +830,11 @@ export default class GeobusquedasControl extends M.Control {
           selected: false,
           disabled: false,
         }
-        options.push(option);    
+        options.push(option);
       });
 
     }
-  
+
     this.choicesSelectorCamposEstiloTab1EL.destroy();
     this.choicesSelectorCamposEstiloTab1EL = new Choices(this.selectorCampoEstiloTab1EL, { allowHTML: true, placeholderValue: 'Seleccione un campo', placeholder: true, searchPlaceholderValue: 'Seleccione un campo', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true, removeItems: true, removeItemButton: false, });
     this.choicesSelectorCamposEstiloTab1EL.setChoices(options);
