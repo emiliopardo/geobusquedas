@@ -539,15 +539,8 @@ export default class GeobusquedasControl extends M.Control {
         let choropleth = new M.style.Choropleth(this.choicesSelectorCamposEstiloTab1EL.getValue(true), [colorInicial, colorFinal], quantification);
 
         capaGeoJSON.setStyle(choropleth);
-        // capaGeoJSON.setStyle(this.estilo);
-        // console.log(choropleth['choroplethStyles_']);
         this.map_.addLayers(capaGeoJSON);
         capaGeoJSON.on(M.evt.LOAD, () => {
-          // capaGeoJSON.getFeatures().forEach(function (f) {
-          //   if (f.getStyle()) {
-          //     f.getStyle().set("polygon.fill.opacity", 0.7);
-          //   }
-          // });
           this.map_.setBbox(capaGeoJSON.getMaxExtent())
         })
       } else {
