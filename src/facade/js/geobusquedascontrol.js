@@ -698,6 +698,7 @@ export default class GeobusquedasControl extends M.Control {
 
       let choiceSelectEL = new Choices(my_select, { allowHTML: true, choices: my_options, placeholderValue: 'Seleccione un valor', placeholder: true, searchPlaceholderValue: 'Seleccione un valor', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true, removeItems: true, removeItemButton: true, });
       my_select.addEventListener('change', () => {
+        this.fieldFilterList = new Array();
         this.checkfieldFilterList(my_field)
         let filter = {
           field: my_field,
