@@ -390,13 +390,10 @@ label.label_rango_valor {
   background-color: #00796b !important;
 }
 
-/* div.m-title {
-  border-bottom: 2px solid #ff9800;
-} */
-
 input[type=range] {
   height: 25px;
   -webkit-appearance: none;
+  appearance: none;
 }
 
 input[type=range]:focus {
@@ -407,7 +404,6 @@ input[type=range]::-webkit-slider-runnable-track {
   width: 100%;
   height: 5px;
   cursor: pointer;
-  animate: 0.2s;
   box-shadow: 0px 0px 0px #000000;
   background: #ddd;
   border-radius: 1px;
@@ -434,7 +430,6 @@ input[type=range]::-moz-range-track {
   width: 100%;
   height: 5px;
   cursor: pointer;
-  animate: 0.2s;
   box-shadow: 0px 0px 0px #000000;
   background: #ddd;
   border-radius: 1px;
@@ -455,7 +450,6 @@ input[type=range]::-ms-track {
   width: 100%;
   height: 5px;
   cursor: pointer;
-  animate: 0.2s;
   background: transparent;
   border-color: transparent;
   color: transparent;
@@ -616,7 +610,6 @@ input[type=checkbox]:checked+.slider:before {
 
 div#loader-container {
   text-align: center;
-  vertical-align: middle;
   width: 100%;
   display: block;
 }
