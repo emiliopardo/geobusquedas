@@ -13,6 +13,8 @@ import { json } from "@codemirror/lang-json"
 import Choices from 'choices.js';
 import GeobusquedasImplControl from 'impl/geobusquedascontrol';
 import template from 'templates/geobusquedas';
+import templateLoading from 'templates/loading';
+import templateError from 'templates/error';
 
 export default class GeobusquedasControl extends M.Control {
   /**
@@ -32,6 +34,8 @@ export default class GeobusquedasControl extends M.Control {
     // 2. implementation of this control
     const impl = new GeobusquedasImplControl();
     super(impl, 'Geobusquedas');
+
+    M.proxy(false);
     //Número maximo de documentos devueltos por elastic
     this.MAX_QUERY_SIZE = 10000;
     this.IndexsListoptions = new Array();
@@ -45,8 +49,6 @@ export default class GeobusquedasControl extends M.Control {
     this.my_request = {
       "query": {
         "bool": {
-          "must": [],
-          "filter": []
         }
       },
       "_source": {
@@ -54,6 +56,39 @@ export default class GeobusquedasControl extends M.Control {
       },
       "size": this.MAX_QUERY_SIZE,
     }
+
+    // Se sobreescribe el estilo por defecto de choropleth
+    M.style.Choropleth.DEFAULT_STYLE = function (c) {
+      return new M.style.Generic({
+        point: {
+          fill: {
+            color: c,
+            opacity: 1,
+          },
+          stroke: {
+            color: '#6c6c6c',
+            width: 0.5,
+          },
+          radius: 5,
+        },
+        line: {
+          stroke: {
+            color: c,
+            width: 1,
+          },
+        },
+        polygon: {
+          fill: {
+            color: c,
+            opacity: 0.7,
+          },
+          stroke: {
+            color: '#6c6c6c',
+            width: 0.5,
+          },
+        },
+      });
+    };
 
 
     //Configuracion de CodeMirror
@@ -81,18 +116,18 @@ export default class GeobusquedasControl extends M.Control {
         ])]
     })
 
-    this.estilo = new M.style.Generic({
-      polygon: {
-        fill: {
-          color: 'green',
-          opacity: 0.5,
-        },
-        stroke: {
-          color: 'green',
-          width: 1
-        }
-      }
-    })
+    // this.estilo = new M.style.Generic({
+    //   polygon: {
+    //     fill: {
+    //       color: 'green',
+    //       opacity: 0.5,
+    //     },
+    //     stroke: {
+    //       color: 'green',
+    //       width: 1
+    //     }
+    //   }
+    // })
   }
 
   /**
@@ -272,7 +307,6 @@ export default class GeobusquedasControl extends M.Control {
       this.showHide(e)
     });
 
-
     this.distanceEL.addEventListener('change', (e) => {
       this.distance = e.target.value;
     });
@@ -298,8 +332,6 @@ export default class GeobusquedasControl extends M.Control {
       this.my_request = {
         "query": {
           "bool": {
-            "must": [],
-            "filter": []
           }
         },
         "_source": {
@@ -406,48 +438,10 @@ export default class GeobusquedasControl extends M.Control {
   search() {
     let indice
     let campos = this.choicesSelectorCamposTab1EL.getValue(true);
-    let must = new Array()
+    //añadimos el campo geom por defecto
     campos.push('geom');
-    if (this.filtersOptionsEL.hasChildNodes()) {
-      this.createFilterQuery(this.filtersOptionsEL.childNodes);
-    }
-    this.fieldFilterList.forEach(element => {
-      if (element['type'] == 'number' && element['operator'] != 'igual que') {
-        let my_range = "{\"range\":{\"" + element['field'] + "\":{\"" + this.parseOperators(element['operator']) + "\":" + element['value'] + "}}}"
-        must.push(JSON.parse(my_range))
-      } else if (element['type'] == 'number' && element['operator'] == 'igual que') {
-        let my_term = "{\"term\":{\"" + element['field'] + "\":" + element['value'] + "}}"
-        must.push(JSON.parse(my_term))
-      } else if (element['type'] == 'text' && element['value'].length > 1) {
-        let my_values = ""
-        element['value'].forEach(element => {
-          my_values = my_values + "\"" + element + "\",";
-        });
-        let my_terms = "{\"terms\":{\"" + element['field'] + "\":[" + my_values + "]}}";
-        must.push(JSON.parse(my_terms.replace(',]', ']')))
-      } else if (element['type'] == 'text' && element['value'].length == 1) {
-        let my_term = "{\"term\":{\"" + element['field'] + "\":\"" + element['value'] + "\"}}"
-        must.push(JSON.parse(my_term))
-      }
-    });
 
-    this.my_request['query']['bool']['must'] = must;
-    this.my_request['_source']['includes'] = campos;
-
-    if (this.lat && this.lon) {
-      this.geo_distance_filter = {
-        "geo_distance": {
-          "distance": this.distance + 'km',
-          "geom": {
-            "lat": this.lat,
-            "lon": this.lon
-          }
-        }
-      }
-      this.my_request['query']['bool']['filter'] = this.geo_distance_filter
-    } else {
-      delete this.my_request.filter
-    }
+    this.my_request = this.buildQuery(campos)
 
     console.log(this.my_request)
 
@@ -462,8 +456,57 @@ export default class GeobusquedasControl extends M.Control {
         break;
     }
     let capaGeoJSON
-    M.proxy(false);
     let url = this.config_.url + '/' + indice + '/search?'
+    let my_vars = {
+      index: indice,
+      fields: this.my_request['_source']['includes'],
+    }
+    if (this.my_request['query']['bool'].hasOwnProperty('filter')) {
+      if (this.my_request['query']['bool']['filter'].hasOwnProperty('geo_distance')) {
+        my_vars['spatial'] = { radio: this.my_request['query']['bool']['filter']['geo_distance']['distance'], coor_y: this.coordenadaYEL.value, coor_x: this.coordenadaXEL.value }
+      }
+    } if (this.my_request['query']['bool'].hasOwnProperty('must')) {
+      let filters = new Array()
+      this.my_request['query']['bool']['must'].forEach(element => {
+        if (element.hasOwnProperty('range')) {
+          let keys = Object.keys(element['range'])
+          keys.forEach(key => {
+            let my_filter = {
+              field: key,
+              value: this.parseInverseOperators(Object.keys(element['range'][key])[0]) + ' ' + element['range'][key][Object.keys(element['range'][key])[0]]
+            }
+            filters.push(my_filter)
+          });
+
+        } else if (element.hasOwnProperty('term')) {
+          let key = Object.keys(element['term'])[0]
+          let values = element['term'][key]
+          let my_filter = {
+            field: key,
+            value: values.toString()
+          }
+          filters.push(my_filter)
+
+        } else if (element.hasOwnProperty('terms')) {
+          let key = Object.keys(element['terms'])[0]
+          let values = element['terms'][key]
+          let my_filter = {
+            field: key,
+            value: values.toString()
+          }
+          filters.push(my_filter)
+        }
+      });
+      my_vars['filters'] = filters
+    }
+
+    this.templateVarsQuery = {
+      vars: my_vars
+    }
+    let htmlLoading = M.template.compileSync(templateLoading, this.templateVarsQuery);
+    M.dialog.info(htmlLoading.outerHTML, 'Procesando Consulta');
+    document.querySelector('div.m-button > button').style.display = 'none';
+    let okButton = document.querySelector('div.m-button > button');
 
     M.remote.post(url, this.my_request).then((res) => {
       this.removeOverlayLayers();
@@ -500,51 +543,26 @@ export default class GeobusquedasControl extends M.Control {
           name: indice
         });
 
-        M.style.Choropleth.DEFAULT_STYLE = function (c) {
-          return new M.style.Generic({
-            point: {
-              fill: {
-                color: c,
-                opacity: 1,
-              },
-              stroke: {
-                color: '#6c6c6c',
-                width: 0.5,
-              },
-              radius: 5,
-            },
-            line: {
-              stroke: {
-                color: c,
-                width: 1,
-              },
-            },
-            polygon: {
-              fill: {
-                color: c,
-                opacity: 0.7,
-              },
-              stroke: {
-                color: '#6c6c6c',
-                width: 0.5,
-              },
-            },
-          });
-        };
+
 
         let colorInicial = document.getElementById("firstColor").value;
         let colorFinal = document.getElementById("lastColor").value;
         let breaks = document.getElementById("breaks").value;
         let quantification = document.getElementById("JENKS").checked ? M.style.quantification.JENKS(breaks) : M.style.quantification.QUANTILE(breaks);
         let choropleth = new M.style.Choropleth(this.choicesSelectorCamposEstiloTab1EL.getValue(true), [colorInicial, colorFinal], quantification);
-
         capaGeoJSON.setStyle(choropleth);
         this.map_.addLayers(capaGeoJSON);
         capaGeoJSON.on(M.evt.LOAD, () => {
           this.map_.setBbox(capaGeoJSON.getMaxExtent())
+          // capaGeoJSON.setStyle(choropleth);
+          setTimeout(() => {
+            okButton.click();
+          }, "1000");
+
         })
       } else {
-        M.dialog.info('No se han encontrado resultados que se ajusten al filtro');
+        let htmlError = M.template.compileSync(templateError, this.templateVarsQuery);
+        M.dialog.info(htmlError.outerHTML, 'No se han Encontrado Resultados');
       }
     })
   }
@@ -664,7 +682,6 @@ export default class GeobusquedasControl extends M.Control {
 
     let my_options = new Array();
     let url = this.config_.url + '/' + indice + '/search?'
-    M.proxy(false);
     M.remote.post(url, request).then((res) => {
 
       let response = JSON.parse(res.text);
@@ -705,7 +722,6 @@ export default class GeobusquedasControl extends M.Control {
         }
       }
     }
-    M.proxy(false);
     M.remote.post(url, request).then((res) => {
       let response = JSON.parse(res.text);
       my_input.setAttribute('min', response['aggregations']['fields_stats']['min']);
@@ -735,7 +751,6 @@ export default class GeobusquedasControl extends M.Control {
       }
     }
 
-    M.proxy(false);
     M.remote.post(url, request).then((res) => {
       let response = JSON.parse(res.text);
 
@@ -776,6 +791,55 @@ export default class GeobusquedasControl extends M.Control {
     });
   }
 
+  buildQuery(campos) {
+    let must = new Array()
+    if (this.filtersOptionsEL.hasChildNodes()) {
+      this.createFilterQuery(this.filtersOptionsEL.childNodes);
+    }
+    this.fieldFilterList.forEach(element => {
+      if (element['type'] == 'number' && element['operator'] != 'igual que') {
+        let my_range = "{\"range\":{\"" + element['field'] + "\":{\"" + this.parseOperators(element['operator']) + "\":" + element['value'] + "}}}"
+        must.push(JSON.parse(my_range))
+      } else if (element['type'] == 'number' && element['operator'] == 'igual que') {
+        let my_term = "{\"term\":{\"" + element['field'] + "\":" + element['value'] + "}}"
+        must.push(JSON.parse(my_term))
+      } else if (element['type'] == 'text' && element['value'].length > 1) {
+        let my_values = ""
+        element['value'].forEach(element => {
+          my_values = my_values + "\"" + element + "\",";
+        });
+        let my_terms = "{\"terms\":{\"" + element['field'] + "\":[" + my_values + "]}}";
+        must.push(JSON.parse(my_terms.replace(',]', ']')))
+      } else if (element['type'] == 'text' && element['value'].length == 1) {
+        let my_term = "{\"term\":{\"" + element['field'] + "\":\"" + element['value'] + "\"}}"
+        must.push(JSON.parse(my_term))
+      }
+    });
+
+    if (must.length > 0) {
+      this.my_request['query']['bool']['must'] = must;
+    }
+    this.my_request['_source']['includes'] = campos;
+
+    if (this.lat && this.lon) {
+      this.geo_distance_filter = {
+        "geo_distance": {
+          "distance": this.distance + 'km',
+          "geom": {
+            "lat": this.lat,
+            "lon": this.lon
+          }
+        }
+      }
+      this.my_request['query']['bool']['filter'] = this.geo_distance_filter
+    } else {
+      delete this.my_request.filter
+    }
+
+    return this.my_request
+
+  }
+
   parseOperators(operator) {
     let result
     switch (operator) {
@@ -790,6 +854,27 @@ export default class GeobusquedasControl extends M.Control {
         break;
       case 'menor o igual que':
         result = "lte"
+        break;
+      default:
+        break;
+    }
+    return result
+  }
+
+  parseInverseOperators(operator) {
+    let result
+    switch (operator) {
+      case 'gt':
+        result = 'mayor que'
+        break;
+      case 'gte':
+        result = 'mayor o igual que'
+        break;
+      case 'lt':
+        result = 'menor que'
+        break;
+      case 'lte':
+        result = 'menor o igual que'
         break;
       default:
         break;
@@ -841,7 +926,6 @@ export default class GeobusquedasControl extends M.Control {
   desActiveAvanceStylePanel() {
     this.choicesSelectorCamposEstiloTab1EL.clearChoices();
     this.choicesSelectorCamposEstiloTab1EL.disable();
-
     document.getElementById('firstColor').disabled = true;
     document.getElementById('lastColor').disabled = true;
     document.getElementById('breaks').disabled = true;
