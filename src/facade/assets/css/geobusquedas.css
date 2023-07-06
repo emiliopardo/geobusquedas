@@ -202,7 +202,7 @@ input[type=color] {
   border-radius: 2.5px !important;
 }
 
-input[type=color]:disabled{
+input[type=color]:disabled {
   cursor: not-allowed
 }
 
@@ -221,7 +221,7 @@ input[type=number]#breaks {
 }
 
 
-input[type=number]#breaks:disabled{
+input[type=number]#breaks:disabled {
   cursor: not-allowed
 }
 
@@ -389,6 +389,10 @@ label.label_rango_valor {
 .m-dialog.info div.m-title {
   background-color: #00796b !important;
 }
+
+/* div.m-title {
+  border-bottom: 2px solid #ff9800;
+} */
 
 input[type=range] {
   height: 25px;
@@ -574,4 +578,50 @@ input[type=checkbox]:checked+.slider:before {
 
 .disabled {
   cursor: not-allowed;
+}
+
+.loader {
+  display: block;
+  position: relative;
+  height: 12px;
+  width: 100%;
+  border: 1px solid #ff9800;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.loader::after {
+  content: '';
+  width: 40%;
+  height: 100%;
+  background: #00796b;
+  position: absolute;
+  top: 0;
+  left: 0;
+  box-sizing: border-box;
+  animation: animloader 2s linear infinite;
+}
+
+@keyframes animloader {
+  0% {
+    left: 0;
+    transform: translateX(-100%);
+  }
+
+  100% {
+    left: 100%;
+    transform: translateX(0%);
+  }
+}
+
+div#loader-container {
+  text-align: center;
+  vertical-align: middle;
+  width: 100%;
+  display: block;
+}
+
+div#filters-container {
+  align-content: center;
+  display: block;
 }

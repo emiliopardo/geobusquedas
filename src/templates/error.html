@@ -1,0 +1,39 @@
+<div id="m-geobusquedas-message">
+    <!-- <div id="error-container">
+        {{error}}
+    </div> -->
+    <div id="filters-container">
+        <span><b>No se han encontrado resultados que se ajusten al filtro</b></span>
+        <ul>
+            <li><b>Indice</b>
+                <ul>
+                    <li>{{index}}</li>
+                </ul>
+            </li>
+            <li><b>Variables Solicitadas</b></li>
+            <ul>
+                {{#each fields}}
+                <li>{{this}}</li>
+                {{/each}}
+            </ul>
+            {{#if filters}}
+            <li><b>Filtro Temático</b>
+                <ul>
+                    {{#each filters}}
+                    <li><b>{{this.field}}:</b> {{this.value}}</li>
+                    {{/each}}
+                </ul>
+            </li>
+            {{/if}}
+            {{#if spatial}}
+            <li><b>Filtro Espacial</b>
+                <ul>
+                    <li><b>Coordenada x:</b> {{spatial.coor_x}}</li>
+                    <li><b>Coordenada y:</b> {{spatial.coor_y}}</li>
+                    <li><b>Radio:</b> {{spatial.radio}}</li>
+                </ul>
+            </li>
+            {{/if}}
+        </ul>      
+    </div>
+</div>
