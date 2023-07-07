@@ -176,8 +176,9 @@ div.opciones-busqueda {
 }
 
 #advanced-styles-container,
-#tematic-filter-container,
-#spatial-filter-container {
+#field-filter-container,
+#spatial-filter-container,
+#tematic-filter-container {
   display: none;
   height: auto;
   background-color: transparent;
@@ -552,7 +553,7 @@ input[type=checkbox]:checked+.slider:before {
   background-color: #fff;
 }
 
-#coordinates-container {
+.coordinates-container {
   vertical-align: top;
   display: inline-block;
   width: 48%;
@@ -617,4 +618,8 @@ div#loader-container {
 div#filters-container {
   align-content: center;
   display: block;
+}
+
+.display-none{
+  display: none;
 }
