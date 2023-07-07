@@ -364,31 +364,17 @@ export default class GeobusquedasControl extends M.Control {
       }
       document.getElementById(this.map_.impl_.map_.values_.target).style.cursor = "alias";
       this.cleanSpatialFilter();
-      this.choicesSelectIndexTab1EL.destroy();
-      this.choicesSelectFieldsTab1EL.destroy();
-      this.choicesSelectFieldsFiltersTab1EL.destroy();
-      this.choicesSelectSpatialFiltersTab1EL.destroy();
-      this.choicesSelectAdvancedStylesFieldTab1EL.destroy();
-      this.choicesSelectIndexTab1EL = new Choices(this.selectIndexTab1EL, { allowHTML: true, placeholderValue: 'Seleccione un indice', placeholder: true, searchPlaceholderValue: 'Seleccione un indice', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true });
-      this.choicesSelectIndexTab1EL.setChoices(this.IndexsListoptions)
-      this.choicesSelectFieldsTab1EL = new Choices(this.selectFieldsTab1EL, { allowHTML: true, placeholderValue: 'Seleccione un campo', placeholder: true, searchPlaceholderValue: 'Seleccione un campo', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true, removeItems: true, removeItemButton: true, });
-      this.choicesSelectFieldsTab1EL.disable();
-      this.choicesSelectSpatialFiltersTab1EL = new Choices(this.selectSpatialFiltersTab1EL, { allowHTML: true, placeholderValue: 'Seleccione filtro espacial', placeholder: true, searchPlaceholderValue: 'Seleccione filtro espacial', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true, removeItems: true, removeItemButton: false, });
-      this.choicesSelectSpatialFiltersTab1EL.disable();
-      this.choicesSelectAdvancedStylesFieldTab1EL = new Choices(this.selectAdvancedStylesFieldTab1EL, { allowHTML: true, placeholderValue: 'Seleccione un campo', placeholder: true, searchPlaceholderValue: 'Seleccione un campo', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true, removeItems: true, removeItemButton: true, });
-      this.choicesSelectAdvancedStylesFieldTab1EL.disable();
-      this.choicesSelectFieldsFiltersTab1EL = new Choices(this.selectFieldsFiltersTab1EL, { allowHTML: true, placeholderValue: 'Seleccione un campo para filtrar', placeholder: true, searchPlaceholderValue: 'Seleccione un campo', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true, removeItems: true, removeItemButton: true, });
-      this.choicesSelectFieldsFiltersTab1EL.disable();
-      this.removeAllChildNodes(this.filtersOptionsEL);
-      this.desActiveAvanceStylePanel();
-      this.fieldFilterList = new Array();
-      this.choicesSelectorIndicesTab2EL.destroy();
-      this.choicesSelectorIndicesTab2EL = new Choices(this.selectIndexTab2EL, { allowHTML: true, placeholderValue: 'Seleccione un indice', placeholder: true, searchPlaceholderValue: 'Seleccione un indice', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true });
-      this.choicesSelectorIndicesTab2EL.setChoices(this.IndexsListoptions)
+      this.cleanIndexs();
+      this.cleanFields();
+      this.cleanFieldsFilters();
+      this.cleanSpatialFilters();
+      this.cleanStyles();
       /* RESETEAMOS LOS VALORES DEL EDITOR */
       this.editor.setState(this.startState_);
+      /* DESACTIVAMOS BOTONES CARGA Y BORRADO*/
       this.loadButtonEL.disabled = true;
       this.clearButtonEL.disabled = true;
+      /* BORRADO DE OVERLAY LAYER*/
       this.removeOverlayLayers();
     })
   }
@@ -986,25 +972,6 @@ export default class GeobusquedasControl extends M.Control {
     this.distanceOutputEL.value = '50Km';
   }
 
-  cleanSpatialFilter() {
-    this.lat = null;
-    this.lon = null;
-    this.checkboxGeomFilterEL.disabled = true;
-    this.checkboxGeomFilterEL.checked = false;
-    this.sliderEL.classList.toggle('disabled');
-    this.distanceEL.disabled = true;
-    this.distanceEL.value = 25;
-    this.distanceOutputEL.value = '50Km';
-    this.coordenadaXEL.disabled = true;
-    this.coordenadaYEL.disabled = true;
-    this.coordenadaXEL.value = null
-    this.coordenadaYEL.value = null;
-    document.getElementById('min_x').value = null;
-    document.getElementById('min_y').value = null;
-    document.getElementById('max_x').value = null;
-    document.getElementById('max_y').value = null;
-  }
-
   removeOverlayLayers() {
     let layerList = this.map_.getLayers()
     layerList.forEach(layer => {
@@ -1069,5 +1036,58 @@ export default class GeobusquedasControl extends M.Control {
     miFeature.getImpl().getOLFeature().getGeometry().transform(this.map_.getProjection().code, 'EPSG:4326');
     return miFeature.getGeometry().coordinates
 
+  }
+
+  cleanIndexs() {
+    this.choicesSelectIndexTab1EL.destroy();
+    this.choicesSelectIndexTab1EL = new Choices(this.selectIndexTab1EL, { allowHTML: true, placeholderValue: 'Seleccione un indice', placeholder: true, searchPlaceholderValue: 'Seleccione un indice', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true });
+    this.choicesSelectIndexTab1EL.setChoices(this.IndexsListoptions)
+    this.choicesSelectorIndicesTab2EL.destroy();
+    this.choicesSelectorIndicesTab2EL = new Choices(this.selectIndexTab2EL, { allowHTML: true, placeholderValue: 'Seleccione un indice', placeholder: true, searchPlaceholderValue: 'Seleccione un indice', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true });
+    this.choicesSelectorIndicesTab2EL.setChoices(this.IndexsListoptions)
+  }
+  cleanFields() {
+    this.choicesSelectFieldsTab1EL.destroy();
+    this.choicesSelectFieldsTab1EL = new Choices(this.selectFieldsTab1EL, { allowHTML: true, placeholderValue: 'Seleccione un campo', placeholder: true, searchPlaceholderValue: 'Seleccione un campo', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true, removeItems: true, removeItemButton: true, });
+    this.choicesSelectFieldsTab1EL.disable();
+  }
+
+
+  cleanSpatialFilter() {
+    this.lat = null;
+    this.lon = null;
+    this.checkboxGeomFilterEL.disabled = true;
+    this.checkboxGeomFilterEL.checked = false;
+    this.sliderEL.classList.toggle('disabled');
+    this.distanceEL.disabled = true;
+    this.distanceEL.value = 25;
+    this.distanceOutputEL.value = '50Km';
+    this.coordenadaXEL.disabled = true;
+    this.coordenadaYEL.disabled = true;
+    this.coordenadaXEL.value = null
+    this.coordenadaYEL.value = null;
+    document.getElementById('min_x').value = null;
+    document.getElementById('min_y').value = null;
+    document.getElementById('max_x').value = null;
+    document.getElementById('max_y').value = null;
+  }
+
+  cleanFieldsFilters() {
+    this.choicesSelectFieldsFiltersTab1EL.destroy();
+    this.choicesSelectFieldsFiltersTab1EL = new Choices(this.selectFieldsFiltersTab1EL, { allowHTML: true, placeholderValue: 'Seleccione un campo para filtrar', placeholder: true, searchPlaceholderValue: 'Seleccione un campo', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true, removeItems: true, removeItemButton: true, });
+    this.choicesSelectFieldsFiltersTab1EL.disable();
+    this.removeAllChildNodes(this.filtersOptionsEL);
+    this.fieldFilterList = new Array();
+  }
+  cleanSpatialFilters() {
+    this.choicesSelectSpatialFiltersTab1EL.destroy();
+    this.choicesSelectSpatialFiltersTab1EL = new Choices(this.selectSpatialFiltersTab1EL, { allowHTML: true, placeholderValue: 'Seleccione filtro espacial', placeholder: true, searchPlaceholderValue: 'Seleccione filtro espacial', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true, removeItems: true, removeItemButton: false, });
+    this.choicesSelectSpatialFiltersTab1EL.disable();
+  }
+  cleanStyles() {
+    this.choicesSelectAdvancedStylesFieldTab1EL.destroy();
+    this.choicesSelectAdvancedStylesFieldTab1EL = new Choices(this.selectAdvancedStylesFieldTab1EL, { allowHTML: true, placeholderValue: 'Seleccione un campo', placeholder: true, searchPlaceholderValue: 'Seleccione un campo', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true, removeItems: true, removeItemButton: true, });
+    this.choicesSelectAdvancedStylesFieldTab1EL.disable();
+    this.desActiveAvanceStylePanel();
   }
 }
