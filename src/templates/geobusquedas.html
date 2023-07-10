@@ -41,17 +41,14 @@
             <div id="spatial-filter-container" title="Filtro Espacial">
               <label class="label-opciones-busqueda" for="selectSpatialFilters">Tipo de Filtro</label>
               <select id="selectSpatialFilters" name="selectSpatialFilters" default-label="tipo de filtro" simple>
-                <option value="" selected disabled>Seleccione un filtro espacial</option>
-                <option value="distance">distancia</option>
-                <option value="boundingBox">Extensión</option>
               </select>
               <div id="distance" class="display-none">
                 <label class="label-opciones-busqueda" for="filtro_geom" id="label_filtro_geom">Activar / Desactivar
                   Captura de Coordenadas</label>
                 <label class="switcherActiveGeomFilter"
                   title="Al activar el filtro se podrán capturar las coordenadas x,y del centro">
-                  <input id="checkboxGeomFilter" type="checkbox" disabled>
-                  <span class="slider round disabled"></span>
+                  <input id="checkboxGeomFilter" type="checkbox">
+                  <span class="slider round"></span>
                 </label>
                 <div id="distance-coordinates-container" class="coordinates-container">
                   <label for="coordenada_x" class="label-opciones-busqueda">Coordenada X:</label><input
@@ -64,7 +61,7 @@
                 <div id="range-container" title="Distancia en kilómetros del radio">
                   <label for="distance" class="label-opciones-busqueda">Radio (entre 1 y 50 km):</label>
                   <input type="range" id="distance" name="distance" min="1" max="50" value="25"
-                    oninput="this.nextElementSibling.value = ' '+this.value+'Km'" disabled>
+                    oninput="this.nextElementSibling.value = ' '+this.value+'Km'">
                   <output id="distance_value">25Km</output>
                 </div>
                 <span class="info-opciones">* Al activar la captura de coordenadas al hacer click en el mapa se copiaran
