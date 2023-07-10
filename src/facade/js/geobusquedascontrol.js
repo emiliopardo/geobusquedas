@@ -87,7 +87,7 @@ export default class GeobusquedasControl extends M.Control {
         polygon: {
           fill: {
             color: c,
-            opacity: 0.7,
+            opacity: 0.8,
           },
           stroke: {
             color: '#6c6c6c',
@@ -462,7 +462,8 @@ export default class GeobusquedasControl extends M.Control {
     let campos = this.choicesSelectFieldsTab1EL.getValue(true);
     //añadimos el campo geom por defecto
     campos.push('geom');
-
+    let sort = "[{\""+this.choicesSelectAdvancedStylesFieldTab1EL.getValue(true)+"\" : {\"order\" : \"asc\"}}]"
+    this.my_request["sort"] = JSON.parse(sort);
     this.my_request = this.buildQuery(campos)
 
     console.log(this.my_request)
@@ -565,14 +566,12 @@ export default class GeobusquedasControl extends M.Control {
           name: indice
         });
 
-
-
-        // let colorInicial = document.getElementById("firstColor").value;
-        // let colorFinal = document.getElementById("lastColor").value;
-        // let breaks = document.getElementById("breaks").value;
-        // let quantification = document.getElementById("JENKS").checked ? M.style.quantification.JENKS(breaks) : M.style.quantification.QUANTILE(breaks);
-        // let choropleth = new M.style.Choropleth(this.choicesSelectAdvancedStylesFieldTab1EL.getValue(true), [colorInicial, colorFinal], quantification);
-        // capaGeoJSON.setStyle(choropleth);
+        let colorInicial = document.getElementById("firstColor").value;
+        let colorFinal = document.getElementById("lastColor").value;
+        let breaks = document.getElementById("breaks").value;
+        let quantification = document.getElementById("JENKS").checked ? M.style.quantification.JENKS(breaks) : M.style.quantification.QUANTILE(breaks);
+        let choropleth = new M.style.Choropleth(this.choicesSelectAdvancedStylesFieldTab1EL.getValue(true), [colorInicial, colorFinal], quantification);
+        capaGeoJSON.setStyle(choropleth);
         this.map_.addLayers(capaGeoJSON);
         capaGeoJSON.on(M.evt.LOAD, () => {
           this.map_.setBbox(capaGeoJSON.getMaxExtent())
