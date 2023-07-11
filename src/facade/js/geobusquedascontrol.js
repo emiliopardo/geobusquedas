@@ -574,10 +574,10 @@ export default class GeobusquedasControl extends M.Control {
         capaGeoJSON.setStyle(choropleth);
         this.map_.addLayers(capaGeoJSON);
         capaGeoJSON.on(M.evt.LOAD, () => {
-          this.map_.setBbox(capaGeoJSON.getMaxExtent())
+          // this.map_.setBbox(capaGeoJSON.getMaxExtent())
           setTimeout(() => {
             okButton.click();
-          }, "1000");
+          }, "500");
 
         })
       } else {
