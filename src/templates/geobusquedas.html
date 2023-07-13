@@ -100,22 +100,29 @@
                   <option>Selecciona un campo</option>
                 </select>
               </div>
-              <div class="colorSelector" title="Selecionar Color Incial">
-                <label for="firstColor" class="label-opciones-busqueda">Color inicial</label>
-                <input id="firstColor" type="color" value="#ffffb2" disabled>
+              <div id="clasificationMethod">
+                <label class="label-opciones-busqueda" for="selectClasificationMethod">Método de Clasificación</label>
+                <select id="selectClasificationMethod" name="selectClasificationMethod"
+                  default-label="Método de Clasificación">
+                  <option selected disabled>Selecciona un metodo de clasificación</option>
+                  <option value="UNIQUE_VALUES">Valores Únicos</option>
+                  <option value="JENKS">Natual Breaks (Jenks)</option>
+                  <option value="QUANTILE">Quantile</option>
+                </select>
               </div>
-              <div class="colorSelector" title="Selecionar Color Final">
-                <label for="lastColor" class="label-opciones-busqueda">Color final</label>
-                <input id="lastColor" type="color" value="#b10026" disabled>
-              </div>
-              <div class="classification-method" title="Método de Clasificación">
-                <label class="label-opciones-busqueda">Método de clasificación</label>
-                <input type="radio" id="JENKS" name="quantification" value="JENKS" checked=true> JENKS
-                <input type="radio" id="QUANTILE" name="quantification" value="QUANTILE"> QUANTILE
-              </div>
-              <div class="classification-ranges" title="Número de Intervalos">
-                <label class="label-opciones-busqueda">Número de Intervalos</label>
-                <input id="breaks" type="number" value=5 min=1 max=7 disabled />
+              <div id="options-classication-methods" class="display-none">
+                <div class="colorSelector" title="Selecionar Color Incial">
+                  <label for="firstColor" class="label-opciones-busqueda">Color inicial</label>
+                  <input id="firstColor" type="color" value="#ffffb2" disabled>
+                </div>
+                <div class="colorSelector" title="Selecionar Color Final">
+                  <label for="lastColor" class="label-opciones-busqueda">Color final</label>
+                  <input id="lastColor" type="color" value="#b10026" disabled>
+                </div>
+                <div class="classification-ranges" title="Número de Intervalos">
+                  <label class="label-opciones-busqueda">Número de Intervalos</label>
+                  <input id="breaks" type="number" value=5 min=1 max=7 disabled />
+                </div>
               </div>
             </div>
           </div>

@@ -189,11 +189,10 @@ div.opciones-busqueda {
 }
 
 div.colorSelector,
-div.classification-ranges,
-div.classification-method {
+div.classification-ranges { 
   margin-top: 5px;
   display: inline-block;
-  width: 48%;
+  width: 30%;
   font-size: 11px;
 }
 
