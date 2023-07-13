@@ -12,21 +12,22 @@ M.addProxyException("http://localhost");
 //   styles: 'default'
 // })
 
-const ortofoto2016_pancromatica = new M.layer.WMS({
-  url: 'https://www.ideandalucia.es/wms/ortofoto2016?',
-  name: 'ortofotografia_2016_pancromatico',
-  legend: 'Ortofotografía Pancromática 0,5 metros/pixel (Año 2016)',
+const ortofoto2016_color = new M.layer.WMS({
+  url: 'http://www.ideandalucia.es/wms/ortofoto2016?',
+  name: 'ortofotografia_2016_rgb',
+  legend: 'Ortofotografía Color 0,5 metros/pixel (Año 2016)',
   transparent: false,
   tiled: true
 }, {
   styles: 'default'
 })
 
+ortofoto2016_color.setLegendURL('https://emiliopardo.github.io/integracion-plugins/visores/leyendas/ortofoto2016_color.png')
 
 const map = M.map({
   container: 'mapjs',
   //layers: [ortofoto2016_color],
-  layers: [ortofoto2016_pancromatica],
+  layers: [ortofoto2016_color],
   // projection: "EPSG:4326*d",
 });
 
