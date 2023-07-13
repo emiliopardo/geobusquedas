@@ -245,6 +245,7 @@ export default class GeobusquedasControl extends M.Control {
     this.choicesSelectFieldsFiltersTab1EL.disable();
     this.choicesSelectSpatialFiltersTab1EL.disable();
     this.choicesSelectAdvancedStylesFieldTab1EL.disable()
+    this.choicesSelectClasificationMethodTab1EL.disable();
     /*******************************/
     /* CARGAMOS EDITOR CODEMIRROR  */
     /*******************************/
@@ -280,11 +281,15 @@ export default class GeobusquedasControl extends M.Control {
     this.selectFieldsTab1EL.addEventListener('change', () => {
       if (this.choicesSelectFieldsTab1EL.getValue(true).length >= 1) {
         this.choicesSelectFieldsFiltersTab1EL.enable()
+        this.choicesSelectClasificationMethodTab1EL.enable();
+        this.choicesSelectClasificationMethodTab1EL.setChoiceByValue('Selecciona un metodo de clasificación');
         this.choicesSelectSpatialFiltersTab1EL.enable();
         this.createSelectOptionStyles();
         this.sliderEL.classList.remove('disabled');
       } else if (this.choicesSelectFieldsTab1EL.getValue(true).length == 0) {
         this.choicesSelectFieldsFiltersTab1EL.disable();
+        this.choicesSelectClasificationMethodTab1EL.removeActiveItems();
+        this.choicesSelectClasificationMethodTab1EL.disable();
         this.choicesSelectFieldsFiltersTab1EL.removeActiveItems();
         this.removeAllChildNodes(this.filtersOptionsEL);
         this.createSelectOptionStyles();
@@ -1073,6 +1078,7 @@ export default class GeobusquedasControl extends M.Control {
   cleanStyles() {
     this.createSelectOptionStyles();
     this.choicesSelectAdvancedStylesFieldTab1EL.disable();
+    this.choicesSelectClasificationMethodTab1EL.disable();
     this.disableInputsStyles()
   }
 
