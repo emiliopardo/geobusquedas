@@ -1084,6 +1084,10 @@ export default class GeobusquedasControl extends M.Control {
 
   /* se desactivan los input de simbología */
   disableInputsStyles() {
+    if (!document.getElementById('options-classication-methods').classList.contains('display-none')) {
+      document.getElementById('options-classication-methods').classList.add('display-none');
+    }
+    this.choicesSelectClasificationMethodTab1EL.setChoiceByValue('Selecciona un metodo de clasificación');
     document.getElementById('firstColor').disabled = true;
     document.getElementById('lastColor').disabled = true;
     document.getElementById('breaks').value = 5;
