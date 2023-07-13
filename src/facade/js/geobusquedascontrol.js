@@ -37,7 +37,8 @@ export default class GeobusquedasControl extends M.Control {
 
     M.proxy(false);
     //Número maximo de documentos devueltos por elastic
-    this.MAX_QUERY_SIZE = 10000;
+    this.MAX_QUERY_SIZE = 60000;
+    // this.MAX_QUERY_SIZE = 10000;
     this.IndexsListoptions = new Array();
     this.config_ = config;
     this.activePanel = 1;
@@ -74,7 +75,7 @@ export default class GeobusquedasControl extends M.Control {
           },
           stroke: {
             color: '#6c6c6c',
-            width: 0.5,
+            width: 1,
           },
           radius: 5,
         },
@@ -87,11 +88,11 @@ export default class GeobusquedasControl extends M.Control {
         polygon: {
           fill: {
             color: c,
-            opacity: 0.8,
+            opacity: 1,
           },
           stroke: {
             color: '#6c6c6c',
-            width: 0.5,
+            width: 1,
           },
         },
       });
@@ -220,6 +221,7 @@ export default class GeobusquedasControl extends M.Control {
     /* filtros estilos avanzados*/
     this.AdvancedStyleEL = html.querySelectorAll('i#advanced-styles')[0];
     this.selectAdvancedStylesFieldTab1EL = html.querySelectorAll('select#selectAdvancedStylesField')[0];
+    this.selectClasificationMethodTab1EL = html.querySelectorAll('select#selectClasificationMethod')[0];
     /* contenido del contenedor de la pestaña 2 */
     this.selectIndexTab2EL = html.querySelectorAll('select#selectIndexTab2')[0];
     this.selectorEditorCodeMirrorTab2EL = html.querySelectorAll('div#editorCodeMirror')[0];
@@ -234,6 +236,7 @@ export default class GeobusquedasControl extends M.Control {
     this.choicesSelectFieldsFiltersTab1EL = new Choices(this.selectFieldsFiltersTab1EL, { allowHTML: true, placeholderValue: 'Seleccione un campo para filtrar', placeholder: true, searchPlaceholderValue: 'Seleccione un campo', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true, removeItems: true, removeItemButton: true, });
     this.choicesSelectSpatialFiltersTab1EL = new Choices(this.selectSpatialFiltersTab1EL, { choices: this.SelectOptionsSpatialFilter, allowHTML: true, placeholderValue: 'Seleccione filtro espacial', placeholder: true, searchPlaceholderValue: 'Seleccione filtro espacial', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true, removeItems: true, removeItemButton: false, });
     this.choicesSelectAdvancedStylesFieldTab1EL = new Choices(this.selectAdvancedStylesFieldTab1EL, { allowHTML: true, placeholderValue: 'Seleccione un campo', placeholder: true, searchPlaceholderValue: 'Seleccione un campo', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true, removeItems: true, removeItemButton: false, });
+    this.choicesSelectClasificationMethodTab1EL = new Choices(this.selectClasificationMethodTab1EL, { allowHTML: true, placeholderValue: 'Seleccione un método', placeholder: true, searchPlaceholderValue: 'Seleccione un método', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: false, shouldSortItems: false, removeItems: true, removeItemButton: false, });
     this.choicesSelectorIndicesTab2EL = new Choices(this.selectIndexTab2EL, { allowHTML: true, placeholderValue: 'Seleccione un indice', placeholder: true, searchPlaceholderValue: 'Seleccione un indice', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true });
     /***********************************************/
     /* INICIALIZAMOS EL CHOICE DE CAMPOS A DISABLE */
@@ -299,6 +302,17 @@ export default class GeobusquedasControl extends M.Control {
       this.removeAllChildNodes(this.filtersOptionsEL);
       if (this.choicesSelectFieldsFiltersTab1EL.getValue(true).length > 0) {
         this.createInputFilters(this.choicesSelectFieldsFiltersTab1EL.getValue(true));
+      }
+    })
+
+    this.selectClasificationMethodTab1EL.addEventListener('change', ()=>{
+      switch (this.choicesSelectClasificationMethodTab1EL.getValue(true)) {
+        case 'UNIQUE_VALUES':
+          html.querySelector('div#options-classication-methods').classList.add('display-none')
+          break;
+        default:
+          html.querySelector('div#options-classication-methods').classList.remove('display-none')
+          break;
       }
     })
     /* evento al cambiar el selector de filtro espacial */
@@ -462,8 +476,8 @@ export default class GeobusquedasControl extends M.Control {
     let campos = this.choicesSelectFieldsTab1EL.getValue(true);
     //añadimos el campo geom por defecto
     campos.push('geom');
-    let sort = "[{\""+this.choicesSelectAdvancedStylesFieldTab1EL.getValue(true)+"\" : {\"order\" : \"asc\"}}]"
-    this.my_request["sort"] = JSON.parse(sort);
+    // let sort = "[{\"" + this.choicesSelectAdvancedStylesFieldTab1EL.getValue(true) + "\" : {\"order\" : \"asc\"}}]"
+    // this.my_request["sort"] = JSON.parse(sort);
     this.my_request = this.buildQuery(campos)
 
     console.log(this.my_request)
@@ -530,11 +544,9 @@ export default class GeobusquedasControl extends M.Control {
     M.dialog.info(htmlLoading.outerHTML, 'Procesando Consulta');
     document.querySelector('div.m-button > button').style.display = 'none';
     let okButton = document.querySelector('div.m-button > button');
-
+    console.time('carga de  datos');
     M.remote.post(url, this.my_request).then((res) => {
       this.removeOverlayLayers();
-
-
       let Arrayfeatures = new Array()
       let response = JSON.parse(res.text)
       let results = response['hits']['hits']
@@ -566,21 +578,25 @@ export default class GeobusquedasControl extends M.Control {
           name: indice
         });
 
-        let colorInicial = document.getElementById("firstColor").value;
-        let colorFinal = document.getElementById("lastColor").value;
-        let breaks = document.getElementById("breaks").value;
-        let quantification = document.getElementById("JENKS").checked ? M.style.quantification.JENKS(breaks) : M.style.quantification.QUANTILE(breaks);
-        let choropleth = new M.style.Choropleth(this.choicesSelectAdvancedStylesFieldTab1EL.getValue(true), [colorInicial, colorFinal], quantification);
-        capaGeoJSON.setStyle(choropleth);
+        let my_style
+        if (this.choicesSelectClasificationMethodTab1EL.getValue(true)!='UNIQUE_VALUES') {
+            my_style = this.createStyle(document.getElementById("firstColor").value,document.getElementById("lastColor").value,this.choicesSelectClasificationMethodTab1EL.getValue(true),document.getElementById("breaks").value);  
+        } else{
+          my_style = new M.style.Category(this.choicesSelectAdvancedStylesFieldTab1EL.getValue(true));
+        }
+        capaGeoJSON.setStyle(my_style)
         this.map_.addLayers(capaGeoJSON);
+        
         capaGeoJSON.on(M.evt.LOAD, () => {
           // this.map_.setBbox(capaGeoJSON.getMaxExtent())
-          setTimeout(() => {
+          // setTimeout(() => {
             okButton.click();
-          }, "500");
-
+          // }, "1000");
+          
         })
-      } else {
+        console.timeEnd('carga de  datos');
+      }
+       else {
         let htmlError = M.template.compileSync(templateError, this.templateVarsQuery);
         M.dialog.info(htmlError.outerHTML, 'No se han Encontrado Resultados');
       }
@@ -889,7 +905,7 @@ export default class GeobusquedasControl extends M.Control {
       }
     }
     /* si tengo filtro espacial añado al query el filtro espacial */
-    if (this.choicesSelectSpatialFiltersTab1EL.getValue(true) == 'distance' && this.coordenadaXEL.value!='' && this.coordenadaYEL.value!='') {
+    if (this.choicesSelectSpatialFiltersTab1EL.getValue(true) == 'distance' && this.coordenadaXEL.value != '' && this.coordenadaYEL.value != '') {
       let coordinates = this.transformPoint([Number(this.coordenadaXEL.value), Number(this.coordenadaYEL.value)])
       this.geo_distance_filter = {
         "geo_distance": {
@@ -1097,6 +1113,21 @@ export default class GeobusquedasControl extends M.Control {
     document.getElementById('min_y').value = null;
     document.getElementById('max_x').value = null;
     document.getElementById('max_y').value = null;
+  }
+
+  createStyle(colorInicial, colorFinal, method, intervals) {
+    let style
+    switch (method) {
+      case 'QUANTILE':
+        style = new M.style.Choropleth(this.choicesSelectAdvancedStylesFieldTab1EL.getValue(true), [colorInicial, colorFinal], M.style.quantification.JENKS(intervals));
+        break;
+      case 'JENKS':
+        style = new M.style.Choropleth(this.choicesSelectAdvancedStylesFieldTab1EL.getValue(true), [colorInicial, colorFinal], M.style.quantification.QUANTILE(intervals));
+        break;
+      default:
+        break;
+    }
+    return style
   }
 
 
