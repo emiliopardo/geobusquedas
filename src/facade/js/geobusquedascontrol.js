@@ -205,6 +205,10 @@ export default class GeobusquedasControl extends M.Control {
     /* contenido del contenedor de la pestaña 1 */
     this.selectIndexTab1EL = html.querySelectorAll('select#selectIndexTab1')[0];
     this.selectFieldsTab1EL = html.querySelectorAll('select#selectFields')[0];
+    /* activadores de filtros*/
+    this.checkboxFiltersEL = html.querySelectorAll('input#checkboxFilters')[0];
+    this.checkboxSpatialEL = html.querySelectorAll('input#checkboxSpatial')[0];
+    this.checkboxStylesEL = html.querySelectorAll('input#checkboxStyles')[0];
     /* filtro tematico de campos */
     this.selectFieldsFiltersTab1EL = html.querySelectorAll('select#selectFieldsFilters')[0];
     this.tematicFilterEL = html.querySelectorAll('i#tematic-filter')[0];
@@ -256,6 +260,19 @@ export default class GeobusquedasControl extends M.Control {
     /************************/
     /* CAPTURAMOS   EVENTOS */
     /************************/
+    this.checkboxFiltersEL.addEventListener('click', () => {
+      console.log('click filtro tematico')
+      console.log(this.checkboxFiltersEL.checked)
+    })
+    this.checkboxSpatialEL.addEventListener('click', () => {
+      console.log('click filtro espacial')
+      console.log(this.checkboxSpatialEL.checked)
+    })
+    this.checkboxStylesEL.addEventListener('click', () => {
+      console.log('click estilos')
+      console.log(this.checkboxStylesEL.checked)
+    })
+
     /* Eventos al hacer click en los tab del panel */
     this.panelTab1El.addEventListener('click', () => {
       this.activePanel = 1;
@@ -310,7 +327,7 @@ export default class GeobusquedasControl extends M.Control {
       }
     })
 
-    this.selectClasificationMethodTab1EL.addEventListener('change', ()=>{
+    this.selectClasificationMethodTab1EL.addEventListener('change', () => {
       switch (this.choicesSelectClasificationMethodTab1EL.getValue(true)) {
         case 'UNIQUE_VALUES':
           html.querySelector('div#options-classication-methods').classList.add('display-none')
@@ -583,25 +600,28 @@ export default class GeobusquedasControl extends M.Control {
           name: indice
         });
 
-        let my_style
-        if (this.choicesSelectClasificationMethodTab1EL.getValue(true)!='UNIQUE_VALUES') {
-            my_style = this.createStyle(document.getElementById("firstColor").value,document.getElementById("lastColor").value,this.choicesSelectClasificationMethodTab1EL.getValue(true),document.getElementById("breaks").value);  
-        } else{
-          my_style = new M.style.Category(this.choicesSelectAdvancedStylesFieldTab1EL.getValue(true));
+        if (this.checkboxStylesEL.checked) {
+          let my_style
+          if (this.choicesSelectClasificationMethodTab1EL.getValue(true) != 'UNIQUE_VALUES') {
+            my_style = this.createStyle(document.getElementById("firstColor").value, document.getElementById("lastColor").value, this.choicesSelectClasificationMethodTab1EL.getValue(true), document.getElementById("breaks").value);
+          } else {
+            my_style = new M.style.Category(this.choicesSelectAdvancedStylesFieldTab1EL.getValue(true));
+          }
+          capaGeoJSON.setStyle(my_style)
+          this.map_.addLayers(capaGeoJSON);
+        } else {
+          this.map_.addLayers(capaGeoJSON)
         }
-        capaGeoJSON.setStyle(my_style)
-        this.map_.addLayers(capaGeoJSON);
-        
         capaGeoJSON.on(M.evt.LOAD, () => {
           // this.map_.setBbox(capaGeoJSON.getMaxExtent())
           // setTimeout(() => {
-            okButton.click();
+          okButton.click();
           // }, "1000");
-          
+
         })
         console.timeEnd('carga de  datos');
       }
-       else {
+      else {
         let htmlError = M.template.compileSync(templateError, this.templateVarsQuery);
         M.dialog.info(htmlError.outerHTML, 'No se han Encontrado Resultados');
       }
@@ -883,7 +903,7 @@ export default class GeobusquedasControl extends M.Control {
     /* añado los campos seleccionados a la query */
     this.my_request['_source']['includes'] = campos;
     /* si tengo filtro temático construyo query con bool must */
-    if (this.filtersOptionsEL.hasChildNodes()) {
+    if (this.checkboxFiltersEL.checked && this.filtersOptionsEL.hasChildNodes()) {
       let must = new Array()
       this.createFilterQuery(this.filtersOptionsEL.childNodes);
       this.fieldFilterList.forEach(element => {
@@ -910,7 +930,7 @@ export default class GeobusquedasControl extends M.Control {
       }
     }
     /* si tengo filtro espacial añado al query el filtro espacial */
-    if (this.choicesSelectSpatialFiltersTab1EL.getValue(true) == 'distance' && this.coordenadaXEL.value != '' && this.coordenadaYEL.value != '') {
+    if (this.checkboxSpatialEL.checked && this.choicesSelectSpatialFiltersTab1EL.getValue(true) == 'distance' && this.coordenadaXEL.value != '' && this.coordenadaYEL.value != '') {
       let coordinates = this.transformPoint([Number(this.coordenadaXEL.value), Number(this.coordenadaYEL.value)])
       this.geo_distance_filter = {
         "geo_distance": {
@@ -922,7 +942,7 @@ export default class GeobusquedasControl extends M.Control {
         }
       }
       this.my_request['query']['bool']['filter'] = this.geo_distance_filter
-    } else if (this.choicesSelectSpatialFiltersTab1EL.getValue(true) == 'boundingBox') {
+    } else if (this.checkboxSpatialEL.checked && this.choicesSelectSpatialFiltersTab1EL.getValue(true) == 'boundingBox') {
       this.geo_bounding_box_filter = {
         "geo_bounding_box": {
           "geom": this.createSpatialFilterBbox()
