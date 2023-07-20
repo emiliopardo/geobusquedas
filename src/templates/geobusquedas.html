@@ -23,9 +23,18 @@
             </select>
           </div>
           <div id="filters" class="opciones-busqueda">
-            <label id="label-filters" class="label-filters" title="Mostrar / Ocultar Filtro Temático"><i
-                class="g-cartografia-mas2" id="tematic-filter" name="tematic-filter"></i>&#32;&#32;Filtro
-              Temático</label>
+            <div id="tematic-filter-header" class="contenedor-cabecera-opciones-busqueda">
+              <div id="label-filters-container" class="label-container">
+                <label id="label-filters" class="label-filters" title="Mostrar / Ocultar Filtro Temático"><i
+                    class="g-cartografia-mas2" id="tematic-filter" name="tematic-filter"></i>&#32;&#32;Filtro
+                  Temático</label>
+              </div>
+              <div id="switcherContainer" class="switcher-container">
+                <label class="switcher" title="Activar / Desactivar filtro temático">
+                  <input id="checkboxFilters" type="checkbox">
+                  <span class="slider round"></span>
+              </div>
+            </div>
             <div id="tematic-filter-container" title="Filtro Temático">
               <label class="label-opciones-busqueda" for="selectFieldsFilters">Campos</label>
               <select id="selectFieldsFilters" name="selectFieldsFilters" default-label="Campos" multiple>
@@ -35,9 +44,18 @@
             </div>
           </div>
           <div id="spatial" name="spatial" class="opciones-busqueda">
-            <label id="label-filter-geom" class="label-filters" title="Mostrar / Ocultar Filtro Espacial"><i
-                class="g-cartografia-mas2" id="spatial-filter" name="spatial-filter"></i>&#32;&#32;Filtro
-              Espacial</label>
+            <div id="spatial-filter-header" class="contenedor-cabecera-opciones-busqueda">
+              <div id="label-spatial-container" class="label-container">
+                <label id="label-filter-geom" class="label-filters" title="Mostrar / Ocultar Filtro Espacial"><i
+                    class="g-cartografia-mas2" id="spatial-filter" name="spatial-filter"></i>&#32;&#32;Filtro
+                  Espacial</label>
+              </div>
+              <div id="switcherContainer" class="switcher-container">
+                <label class="switcher" title="Activar / Desactivar filtro espacial">
+                  <input id="checkboxSpatial" type="checkbox">
+                  <span class="slider round"></span>
+              </div>
+            </div>
             <div id="spatial-filter-container" title="Filtro Espacial">
               <label class="label-opciones-busqueda" for="selectSpatialFilters">Tipo de Filtro</label>
               <select id="selectSpatialFilters" name="selectSpatialFilters" default-label="tipo de filtro" simple>
@@ -45,8 +63,7 @@
               <div id="distance" class="display-none">
                 <label class="label-opciones-busqueda" for="filtro_geom" id="label_filtro_geom">Activar / Desactivar
                   Captura de Coordenadas</label>
-                <label class="switcherActiveGeomFilter"
-                  title="Al activar el filtro se podrán capturar las coordenadas x,y del centro">
+                <label class="switcher" title="Al activar el filtro se podrán capturar las coordenadas x,y del centro">
                   <input id="checkboxGeomFilter" type="checkbox">
                   <span class="slider round"></span>
                 </label>
@@ -90,9 +107,18 @@
             </div>
           </div>
           <div id="styles" class="opciones-busqueda">
-            <label id="label-styles" class="label-filters" title="Mostrar / Ocultar Simbología Avanzada"><i
-                class="g-cartografia-mas2" id="advanced-styles" name="advanced-styles"></i>&#32;&#32;Simbología
-              Avanzada</label>
+            <div id="styles-header" class="contenedor-cabecera-opciones-busqueda">
+              <div id="label-styles-container" class="label-container">
+                <label id="label-styles" class="label-filters" title="Mostrar / Ocultar Simbología Avanzada"><i
+                    class="g-cartografia-mas2" id="advanced-styles" name="advanced-styles"></i>&#32;&#32;Simbología
+                  Avanzada </label>
+              </div>
+              <div id="switcherContainer" class="switcher-container">
+                <label class="switcher" title="Activar / Desactivar simbología avanzada">
+                  <input id="checkboxStyles" type="checkbox">
+                  <span class="slider round"></span>
+              </div>
+            </div>
             <div id="advanced-styles-container">
               <div id="fieldSelector">
                 <label class="label-opciones-busqueda" for="selectAdvancedStylesField">Campo de Representación</label>
@@ -104,7 +130,8 @@
                 <label class="label-opciones-busqueda" for="selectClasificationMethod">Método de Clasificación</label>
                 <select id="selectClasificationMethod" name="selectClasificationMethod"
                   default-label="Método de Clasificación">
-                  <option value='Selecciona un metodo de clasificación' selected disabled>Selecciona un metodo de clasificación</option>
+                  <option value='Selecciona un metodo de clasificación' selected disabled>Selecciona un metodo de
+                    clasificación</option>
                   <option value="UNIQUE_VALUES">Valores Únicos</option>
                   <option value="JENKS">Natual Breaks (Jenks)</option>
                   <option value="QUANTILE">Quantile</option>

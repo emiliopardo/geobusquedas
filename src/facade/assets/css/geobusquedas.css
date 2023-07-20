@@ -189,7 +189,7 @@ div.opciones-busqueda {
 }
 
 div.colorSelector,
-div.classification-ranges { 
+div.classification-ranges {
   margin-top: 5px;
   display: inline-block;
   width: 30%;
@@ -497,7 +497,7 @@ input[type=range]:disabled {
 }
 
 
-.switcherActiveGeomFilter {
+.switcher {
   position: relative;
   display: block;
   margin-left: 5px;
@@ -619,6 +619,25 @@ div#filters-container {
   display: block;
 }
 
-.display-none{
+.display-none {
   display: none;
+}
+
+.contenedor-cabecera-opciones-busqueda {
+  background-color: #eaeaea;
+  line-height: 20px;
+}
+
+.switcher-container {
+  /* display: inline-block; */
+  background-color: #eaeaea;
+  float: right;
+  padding: 5px;
+  ;
+}
+
+.label-container {
+  display: inline-block;
+  background-color: #eaeaea;
+  /* line-height: 20px; */
 }
