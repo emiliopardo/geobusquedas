@@ -75,14 +75,14 @@ export default class GeobusquedasControl extends M.Control {
           },
           stroke: {
             color: '#6c6c6c',
-            width: 1,
+            width: 0.3,
           },
           radius: 5,
         },
         line: {
           stroke: {
             color: c,
-            width: 1,
+            width: 0.3,
           },
         },
         polygon: {
@@ -92,7 +92,7 @@ export default class GeobusquedasControl extends M.Control {
           },
           stroke: {
             color: '#6c6c6c',
-            width: 1,
+            width: 0.3,
           },
         },
       });
@@ -447,8 +447,9 @@ export default class GeobusquedasControl extends M.Control {
   /* obtenemos el listado de campos del indice seleccionado */
   getFields(index) {
     M.remote.get(this.config_.url + '/' + index + '/fields').then((response) => {
-      let indexInfo = JSON.parse(response.text);
-      let fieldsObject = indexInfo[index]['mappings']['properties'];
+      this.mappings =
+        this.indexInfo = JSON.parse(response.text);
+      let fieldsObject = this.indexInfo[index]['mappings']['properties'];
       let fieldsArray = Object.keys(fieldsObject);
       let options = new Array();
       this.fieldsFilters = new Array();
@@ -610,6 +611,9 @@ export default class GeobusquedasControl extends M.Control {
           capaGeoJSON.setStyle(my_style)
           this.map_.addLayers(capaGeoJSON);
         } else {
+          let field = this.choicesSelectFieldsTab1EL.getValue(true);
+          // my_style = this.createDefaultFieldStyle(this.indexInfo[indice]['mappings']['_meta']['styles'][field[0]])
+          capaGeoJSON.setStyle(this.createDefaultFieldStyle(field[0], this.indexInfo[indice]['mappings']['_meta']['styles'][field[0]]))
           this.map_.addLayers(capaGeoJSON)
         }
         capaGeoJSON.on(M.evt.LOAD, () => {
@@ -1160,5 +1164,28 @@ export default class GeobusquedasControl extends M.Control {
     return style
   }
 
-
+  createDefaultFieldStyle(field, styles) {
+    let my_categoryStyles = {}
+    console.log(styles)
+    let response
+    if (styles) {
+      switch (styles['type']) {
+        case 'category':
+          styles['values'].forEach(element => {
+            my_categoryStyles[element.value] = new M.style.Generic({ polygon: { fill: { color: element.color }, stroke: { color: '#6c6c6c', width: 0.1}, } });
+          });
+          response = new M.style.Category(field, my_categoryStyles);
+          break;
+        case 'ranges':
+          response = new M.style.Choropleth(field, [styles['initcolor'], styles['finalcolor']], () => (styles['intervals']));
+          break
+        default:
+          response = new M.style.Category(field)
+          break;
+      }
+    } else {
+      response = new M.style.Category(field)
+    }
+    return response
+  }
 }
