@@ -260,18 +260,18 @@ export default class GeobusquedasControl extends M.Control {
     /************************/
     /* CAPTURAMOS   EVENTOS */
     /************************/
-    this.checkboxFiltersEL.addEventListener('click', () => {
-      console.log('click filtro tematico')
-      console.log(this.checkboxFiltersEL.checked)
-    })
-    this.checkboxSpatialEL.addEventListener('click', () => {
-      console.log('click filtro espacial')
-      console.log(this.checkboxSpatialEL.checked)
-    })
-    this.checkboxStylesEL.addEventListener('click', () => {
-      console.log('click estilos')
-      console.log(this.checkboxStylesEL.checked)
-    })
+    // this.checkboxFiltersEL.addEventListener('click', () => {
+    //   console.log('click filtro tematico')
+    //   console.log(this.checkboxFiltersEL.checked)
+    // })
+    // this.checkboxSpatialEL.addEventListener('click', () => {
+    //   console.log('click filtro espacial')
+    //   console.log(this.checkboxSpatialEL.checked)
+    // })
+    // this.checkboxStylesEL.addEventListener('click', () => {
+    //   console.log('click estilos')
+    //   console.log(this.checkboxStylesEL.checked)
+    // })
 
     /* Eventos al hacer click en los tab del panel */
     this.panelTab1El.addEventListener('click', () => {
@@ -499,12 +499,7 @@ export default class GeobusquedasControl extends M.Control {
     let campos = this.choicesSelectFieldsTab1EL.getValue(true);
     //añadimos el campo geom por defecto
     campos.push('geom');
-    // let sort = "[{\"" + this.choicesSelectAdvancedStylesFieldTab1EL.getValue(true) + "\" : {\"order\" : \"asc\"}}]"
-    // this.my_request["sort"] = JSON.parse(sort);
     this.my_request = this.buildQuery(campos)
-
-    console.log(this.my_request)
-
     switch (this.activePanel) {
       case 1:
         indice = this.choicesSelectIndexTab1EL.getValue(true);
@@ -612,18 +607,16 @@ export default class GeobusquedasControl extends M.Control {
           this.map_.addLayers(capaGeoJSON);
         } else {
           let field = this.choicesSelectFieldsTab1EL.getValue(true);
-          // my_style = this.createDefaultFieldStyle(this.indexInfo[indice]['mappings']['_meta']['styles'][field[0]])
-          capaGeoJSON.setStyle(this.createDefaultFieldStyle(field[0], this.indexInfo[indice]['mappings']['_meta']['styles'][field[0]]))
+          let my_style =this.createDefaultFieldStyle(field[0], this.indexInfo[indice]['mappings']['_meta']['styles'][field[0]])
+          // console.log(my_style)
+          // console.log(my_style.getChoroplethStyles())
+          capaGeoJSON.setStyle(my_style)
           this.map_.addLayers(capaGeoJSON)
         }
         capaGeoJSON.on(M.evt.LOAD, () => {
-          // this.map_.setBbox(capaGeoJSON.getMaxExtent())
-          // setTimeout(() => {
           okButton.click();
-          // }, "1000");
-
+          console.timeEnd('carga de  datos');
         })
-        console.timeEnd('carga de  datos');
       }
       else {
         let htmlError = M.template.compileSync(templateError, this.templateVarsQuery);
@@ -1166,18 +1159,27 @@ export default class GeobusquedasControl extends M.Control {
 
   createDefaultFieldStyle(field, styles) {
     let my_categoryStyles = {}
-    console.log(styles)
     let response
     if (styles) {
       switch (styles['type']) {
         case 'category':
           styles['values'].forEach(element => {
-            my_categoryStyles[element.value] = new M.style.Generic({ polygon: { fill: { color: element.color }, stroke: { color: '#6c6c6c', width: 0.1}, } });
+            my_categoryStyles[element.value] = new M.style.Generic({ polygon: { fill: { color: element.color }, stroke: { color: '#6c6c6c', width: 0.1 }, } });
           });
           response = new M.style.Category(field, my_categoryStyles);
           break;
         case 'ranges':
           response = new M.style.Choropleth(field, [styles['initcolor'], styles['finalcolor']], () => (styles['intervals']));
+          /* hay que hablar con sigc para ver como podemos meter un valor por defecto para lo que no tiene de dato o es secreto estadístico */
+          // console.log(response)
+          // console.log(response.layer_)
+          // console.log(response.getAttributeName())
+          // console.log(response.getChoroplethStyles())
+          // console.log(response.getStyles())
+          // response.on('M.evt.CHANGE',()=>{
+          //   console.log(response.getStyles())
+          // })
+
           break
         default:
           response = new M.style.Category(field)
