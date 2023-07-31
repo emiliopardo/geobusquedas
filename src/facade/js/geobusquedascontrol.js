@@ -37,13 +37,13 @@ export default class GeobusquedasControl extends M.Control {
 
     M.proxy(false);
     //Número maximo de documentos devueltos por elastic
-    this.MAX_QUERY_SIZE = 60000;
-    // this.MAX_QUERY_SIZE = 10000;
+    // this.MAX_QUERY_SIZE = 60000;
+    this.MAX_QUERY_SIZE = 10000;
     this.IndexsListoptions = new Array();
     this.config_ = config;
     this.activePanel = 1;
     this.fieldFilterList = new Array();
-    this.geo_distance_filter;
+    this.geo_distance_filter = null;
     this.SelectOptionsSpatialFilter = [
       {
         value: 'Seleccione un filtro espacial',
@@ -1169,6 +1169,7 @@ export default class GeobusquedasControl extends M.Control {
           response = new M.style.Category(field, my_categoryStyles);
           break;
         case 'ranges':
+          console.log(styles['intervals'])
           response = new M.style.Choropleth(field, [styles['initcolor'], styles['finalcolor']], () => (styles['intervals']));
           /* hay que hablar con sigc para ver como podemos meter un valor por defecto para lo que no tiene de dato o es secreto estadístico */
           // console.log(response)
