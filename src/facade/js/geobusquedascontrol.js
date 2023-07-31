@@ -36,6 +36,14 @@ export default class GeobusquedasControl extends M.Control {
     super(impl, 'Geobusquedas');
 
     M.proxy(false);
+    this._my_headers = new Headers
+    let username = 'factorylab'
+    let password = 'kibanaLab123'
+    // let username = 'elastic';
+    // let password = 'secret'
+    this._my_headers.set('Authorization', 'Basic ' + btoa(username + ":" + password));
+    this._my_headers.set('Content-Type', 'application/json; charset=utf-8')
+
     //Número maximo de documentos devueltos por elastic
     // this.MAX_QUERY_SIZE = 60000;
     this.MAX_QUERY_SIZE = 10000;
@@ -408,8 +416,9 @@ export default class GeobusquedasControl extends M.Control {
       disabled: true,
     }
     this.IndexsListoptions.push(my_option)
-    M.remote.get(this.config_.url + '/indices?format=json').then((response) => {
-      let responseIndexList = JSON.parse(response.text);
+    fetch(this.config_.url + '/_cat/indices?format=json', { method: 'GET', headers: this._my_headers }).then(res => res.json()
+    ).then(res => {
+      let responseIndexList = res;
       responseIndexList.forEach(element => {
         let indexName = element['index']
         if (!indexName.includes('.')) {
@@ -426,15 +435,34 @@ export default class GeobusquedasControl extends M.Control {
       this.choicesSelectIndexTab1EL.setChoices(this.IndexsListoptions)
       this.choicesSelectorIndicesTab2EL.setChoices(this.IndexsListoptions)
     })
+    // M.remote.get(this.config_.url + '/indices?format=json').then((response) => {
+    //   let responseIndexList = JSON.parse(response.text);
+    //   responseIndexList.forEach(element => {
+    //     let indexName = element['index']
+    //     if (!indexName.includes('.')) {
+    //       let my_option = {
+    //         value: indexName,
+    //         label: indexName,
+    //         selected: false,
+    //         disabled: false,
+    //       }
+    //       this.IndexsListoptions.push(my_option)
+    //     }
+    //   });
+
+    //   this.choicesSelectIndexTab1EL.setChoices(this.IndexsListoptions)
+    //   this.choicesSelectorIndicesTab2EL.setChoices(this.IndexsListoptions)
+    // })
     return new Promise((success) => {
       success()
     })
   }
   /* obtenemos el listado de campos del indice seleccionado */
   getFields(index) {
-    M.remote.get(this.config_.url + '/' + index + '/fields').then((response) => {
+    fetch(this.config_.url + '/' + index + '/_mapping?format=json', { method: 'GET', headers: this._my_headers }).then(res => res.json()
+    ).then(res => {
       this.mappings =
-        this.indexInfo = JSON.parse(response.text);
+        this.indexInfo = res;
       let fieldsObject = this.indexInfo[index]['mappings']['properties'];
       let fieldsArray = Object.keys(fieldsObject);
       let options = new Array();
@@ -466,7 +494,43 @@ export default class GeobusquedasControl extends M.Control {
       this.choicesSelectFieldsFiltersTab1EL.setChoices(options, 'value', 'label', true);
       this.choicesSelectFieldsTab1EL.enable();
       this.choicesSelectFieldsFiltersTab1EL.disable()
+
     })
+    // M.remote.get(this.config_.url + '/' + index + '/fields').then((response) => {
+    //   this.mappings =
+    //   this.indexInfo = JSON.parse(response.text);
+    //   let fieldsObject = this.indexInfo[index]['mappings']['properties'];
+    //   let fieldsArray = Object.keys(fieldsObject);
+    //   let options = new Array();
+    //   this.fieldsFilters = new Array();
+
+    //   fieldsArray.forEach(field => {
+    //     if (field != 'geom') {
+
+    //       let filter = {
+    //         field: field,
+    //         type: fieldsObject[field]['type']
+    //       }
+
+    //       this.fieldsFilters.push(filter)
+
+    //       let option = {
+    //         value: field,
+    //         label: field,
+    //         selected: false,
+    //         disabled: false,
+    //       }
+    //       options.push(option);
+    //     }
+    //   })
+    //   /* reseteo los choices de campo seleccionado y campos para filtro */
+    //   this.choicesSelectFieldsTab1EL.clearStore()
+    //   this.choicesSelectFieldsFiltersTab1EL.clearStore()
+    //   this.choicesSelectFieldsTab1EL.setChoices(options, 'value', 'label', true);
+    //   this.choicesSelectFieldsFiltersTab1EL.setChoices(options, 'value', 'label', true);
+    //   this.choicesSelectFieldsTab1EL.enable();
+    //   this.choicesSelectFieldsFiltersTab1EL.disable()
+    // })
   }
 
   search() {
@@ -497,7 +561,8 @@ export default class GeobusquedasControl extends M.Control {
         break;
     }
     let capaGeoJSON
-    let url = this.config_.url + '/' + indice + '/search?'
+    // let url = this.config_.url + '/' + indice + '/search?'
+    let url = this.config_.url + '/' + indice + '/_search?'
     let my_vars = {
       index: indice,
       fields: this.my_request['_source']['includes'],
@@ -550,10 +615,12 @@ export default class GeobusquedasControl extends M.Control {
     document.querySelector('div.m-button > button').style.display = 'none';
     let okButton = document.querySelector('div.m-button > button');
     console.time('carga de  datos');
-    M.remote.post(url, this.my_request).then((res) => {
+
+    fetch(url, { method: 'POST', headers: this._my_headers, body: JSON.stringify(this.my_request)}).then(res => res.json()
+    ).then(res => {
       this.removeOverlayLayers();
       let Arrayfeatures = new Array()
-      let response = JSON.parse(res.text)
+      let response = res
       let results = response['hits']['hits']
       if (results.length != 0) {
         results.forEach(element => {
@@ -595,8 +662,6 @@ export default class GeobusquedasControl extends M.Control {
         } else {
           let field = this.choicesSelectFieldsTab1EL.getValue(true);
           let my_style = this.createDefaultFieldStyle(field[0], this.indexInfo[indice]['mappings']['_meta']['styles'][field[0]])
-          // console.log(my_style)
-          // console.log(my_style.getChoroplethStyles())
           capaGeoJSON.setStyle(my_style)
           this.map_.addLayers(capaGeoJSON)
         }
@@ -609,7 +674,66 @@ export default class GeobusquedasControl extends M.Control {
         let htmlError = M.template.compileSync(templateError, this.templateVarsQuery);
         M.dialog.info(htmlError.outerHTML, 'No se han Encontrado Resultados');
       }
+
     })
+    // M.remote.post(url, this.my_request).then((res) => {
+    //   this.removeOverlayLayers();
+    //   let Arrayfeatures = new Array()
+    //   let response = JSON.parse(res.text)
+    //   let results = response['hits']['hits']
+    //   if (results.length != 0) {
+    //     results.forEach(element => {
+
+    //       let miFeature = new M.Feature(element['_id'], {
+    //         "type": "Feature",
+    //         "id": "element['_id']",
+    //         "geometry": element['_source']['geom'],
+    //         "geometry_name": "geometry",
+    //       });
+
+    //       let fields = Object.keys(element['_source'])
+    //       fields.forEach(field => {
+    //         if (field != 'geom') {
+    //           miFeature.setAttribute(field, element['_source'][field])
+    //         }
+    //       });
+    //       Arrayfeatures.push(miFeature.getGeoJSON())
+    //     });
+
+    //     capaGeoJSON = new M.layer.GeoJSON({
+    //       source: {
+    //         "crs": { "properties": { "name": "EPSG:4326" }, "type": "name" },
+    //         "features": Arrayfeatures,
+    //         "type": "FeatureCollection"
+    //       },
+    //       name: indice
+    //     });
+
+    //     if (this.checkboxStylesEL.checked) {
+    //       let my_style
+    //       if (this.choicesSelectClasificationMethodTab1EL.getValue(true) != 'UNIQUE_VALUES') {
+    //         my_style = this.createStyle(document.getElementById("firstColor").value, document.getElementById("lastColor").value, this.choicesSelectClasificationMethodTab1EL.getValue(true), document.getElementById("breaks").value);
+    //       } else {
+    //         my_style = new M.style.Category(this.choicesSelectAdvancedStylesFieldTab1EL.getValue(true));
+    //       }
+    //       capaGeoJSON.setStyle(my_style)
+    //       this.map_.addLayers(capaGeoJSON);
+    //     } else {
+    //       let field = this.choicesSelectFieldsTab1EL.getValue(true);
+    //       let my_style = this.createDefaultFieldStyle(field[0], this.indexInfo[indice]['mappings']['_meta']['styles'][field[0]])
+    //       capaGeoJSON.setStyle(my_style)
+    //       this.map_.addLayers(capaGeoJSON)
+    //     }
+    //     capaGeoJSON.on(M.evt.LOAD, () => {
+    //       okButton.click();
+    //       console.timeEnd('carga de  datos');
+    //     })
+    //   }
+    //   else {
+    //     let htmlError = M.template.compileSync(templateError, this.templateVarsQuery);
+    //     M.dialog.info(htmlError.outerHTML, 'No se han Encontrado Resultados');
+    //   }
+    // })
   }
 
   createInputFilters(arrayFields) {
@@ -770,10 +894,12 @@ export default class GeobusquedasControl extends M.Control {
     }
 
     let my_options = new Array();
-    let url = this.config_.url + '/' + indice + '/search?'
-    M.remote.post(url, request).then((res) => {
+    // let url = this.config_.url + '/' + indice + '/search?'
+    let url = this.config_.url + '/' + indice + '/_search?'
 
-      let response = JSON.parse(res.text);
+    fetch(url, { method: 'POST', headers: this._my_headers, body: JSON.stringify(request)}).then(res => res.json()
+    ).then(res => {
+      let response = res;
       let buckets = response['aggregations']['my-agg-name']['buckets'];
 
       buckets.forEach(bucket => {
@@ -796,13 +922,41 @@ export default class GeobusquedasControl extends M.Control {
         }
         this.fieldFilterList.push(filter);
       })
+
     })
+    // M.remote.post(url, request).then((res) => {
+
+    //   let response = JSON.parse(res.text);
+    //   let buckets = response['aggregations']['my-agg-name']['buckets'];
+
+    //   buckets.forEach(bucket => {
+    //     my_options.push({
+    //       value: bucket['key'],
+    //       label: bucket['key'],
+    //       selected: false,
+    //       disabled: false
+    //     });
+    //   });
+
+    //   let choiceSelectEL = new Choices(my_select, { allowHTML: true, choices: my_options, placeholderValue: 'Seleccione un valor', placeholder: true, searchPlaceholderValue: 'Seleccione un valor', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true, removeItems: true, removeItemButton: true, });
+    //   my_select.addEventListener('change', () => {
+    //     this.fieldFilterList = new Array();
+    //     this.checkfieldFilterList(my_field)
+    //     let filter = {
+    //       field: my_field,
+    //       type: 'text',
+    //       value: choiceSelectEL.getValue(true)
+    //     }
+    //     this.fieldFilterList.push(filter);
+    //   })
+    // })
   }
 
   /* metodo para obtener estadisticas básicas */
   getBasictStatsFields(my_field, my_input) {
     let indice = this.choicesSelectIndexTab1EL.getValue(true);
-    let url = this.config_.url + '/' + indice + '/search?'
+    // let url = this.config_.url + '/' + indice + '/search?'
+    let url = this.config_.url + '/' + indice + '/_search?'
     let request = {
       "size": 0,
       "aggs": {
@@ -813,8 +967,10 @@ export default class GeobusquedasControl extends M.Control {
         }
       }
     }
-    M.remote.post(url, request).then((res) => {
-      let response = JSON.parse(res.text);
+
+    fetch(url, { method: 'POST', headers: this._my_headers, body: JSON.stringify(request)}).then(res => res.json()
+    ).then(res => {
+      let response = JSON.parse(res);
       my_input.setAttribute('min', response['aggregations']['fields_stats']['min']);
       my_input.setAttribute('max', response['aggregations']['fields_stats']['max'])
       my_input.setAttribute('placeholder', 'introduce un valor');
@@ -824,13 +980,27 @@ export default class GeobusquedasControl extends M.Control {
       myMinMaxlabel.innerHTML = '* introduce un valor entre ' + response['aggregations']['fields_stats']['min'] + ' y ' + response['aggregations']['fields_stats']['max']
       let parentDiv = document.getElementById(my_field);
       parentDiv.appendChild(myMinMaxlabel)
+
     })
+    // M.remote.post(url, request).then((res) => {
+    //   let response = JSON.parse(res.text);
+    //   my_input.setAttribute('min', response['aggregations']['fields_stats']['min']);
+    //   my_input.setAttribute('max', response['aggregations']['fields_stats']['max'])
+    //   my_input.setAttribute('placeholder', 'introduce un valor');
+    //   let myMinMaxlabel = document.createElement("label");
+    //   myMinMaxlabel.setAttribute('id', 'rango_' + my_field);
+    //   myMinMaxlabel.setAttribute('class', 'label_rango_valor');
+    //   myMinMaxlabel.innerHTML = '* introduce un valor entre ' + response['aggregations']['fields_stats']['min'] + ' y ' + response['aggregations']['fields_stats']['max']
+    //   let parentDiv = document.getElementById(my_field);
+    //   parentDiv.appendChild(myMinMaxlabel)
+    // })
   }
 
   /* metodo para obtener estadisticas avanzadas */
   getAdvancedtStatsFields(my_field, my_input) {
     let indice = this.choicesSelectIndexTab1EL.getValue(true);
-    let url = this.config_.url + '/' + indice + '/search?'
+    // let url = this.config_.url + '/' + indice + '/search?'
+    let url = this.config_.url + '/' + indice + '/_search?'
     let request = {
       "size": 0,
       "aggs": {
@@ -843,11 +1013,17 @@ export default class GeobusquedasControl extends M.Control {
       }
     }
 
-    M.remote.post(url, request).then((res) => {
-      let response = JSON.parse(res.text);
+    fetch(url, { method: 'POST', headers: this._my_headers, body: JSON.stringify(request)}).then(res => res.json()
+    ).then(res => {
+      let response = res;
 
       console.log(response)
-    })
+     })
+
+    // M.remote.post(url, request).then((res) => {
+    //   let response = JSON.parse(res.text);
+    //   console.log(response)
+    // })
   }
 
   showHide(event) {
