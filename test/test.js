@@ -61,6 +61,7 @@ let configuracion = {
   config: {
     title: 'Test Elasticsearch',
     url: 'https://elasticlab.ieca.junta-andalucia.es'
+    // url: 'https://localhost:9200'
   },
   options: {
     position: 'TL',
