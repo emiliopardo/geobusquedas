@@ -260,19 +260,6 @@ export default class GeobusquedasControl extends M.Control {
     /************************/
     /* CAPTURAMOS   EVENTOS */
     /************************/
-    // this.checkboxFiltersEL.addEventListener('click', () => {
-    //   console.log('click filtro tematico')
-    //   console.log(this.checkboxFiltersEL.checked)
-    // })
-    // this.checkboxSpatialEL.addEventListener('click', () => {
-    //   console.log('click filtro espacial')
-    //   console.log(this.checkboxSpatialEL.checked)
-    // })
-    // this.checkboxStylesEL.addEventListener('click', () => {
-    //   console.log('click estilos')
-    //   console.log(this.checkboxStylesEL.checked)
-    // })
-
     /* Eventos al hacer click en los tab del panel */
     this.panelTab1El.addEventListener('click', () => {
       this.activePanel = 1;
@@ -313,7 +300,6 @@ export default class GeobusquedasControl extends M.Control {
         this.choicesSelectAdvancedStylesFieldTab1EL.disable();
         this.disableInputsStyles();
         this.cleanSpatialFilters();
-        // document.getElementById(this.map_.impl_.map_.values_.target).style.cursor = "alias";
       }
       this.loadButtonEL.disabled = false;
       this.clearButtonEL.disabled = false;
@@ -520,7 +506,8 @@ export default class GeobusquedasControl extends M.Control {
       if (this.my_request['query']['bool']['filter'].hasOwnProperty('geo_distance')) {
         my_vars['spatial'] = { radio: this.my_request['query']['bool']['filter']['geo_distance']['distance'], coor_y: this.coordenadaYEL.value, coor_x: this.coordenadaXEL.value }
       }
-    } if (this.my_request['query']['bool'].hasOwnProperty('must')) {
+    }
+    if (this.my_request['query']['bool'].hasOwnProperty('must')) {
       let filters = new Array()
       this.my_request['query']['bool']['must'].forEach(element => {
         if (element.hasOwnProperty('range')) {
@@ -607,7 +594,7 @@ export default class GeobusquedasControl extends M.Control {
           this.map_.addLayers(capaGeoJSON);
         } else {
           let field = this.choicesSelectFieldsTab1EL.getValue(true);
-          let my_style =this.createDefaultFieldStyle(field[0], this.indexInfo[indice]['mappings']['_meta']['styles'][field[0]])
+          let my_style = this.createDefaultFieldStyle(field[0], this.indexInfo[indice]['mappings']['_meta']['styles'][field[0]])
           // console.log(my_style)
           // console.log(my_style.getChoroplethStyles())
           capaGeoJSON.setStyle(my_style)
@@ -1050,7 +1037,7 @@ export default class GeobusquedasControl extends M.Control {
 
   /* metodo para transformar geometrias puntuales del srs del mapa a 4326 */
   transformPoint(coord) {
-    var miFeature = new M.Feature("featurePrueba001", {
+    let miFeature = new M.Feature("featurePrueba001", {
       type: "Feature",
       geometry: {
         type: "Point",
@@ -1172,15 +1159,6 @@ export default class GeobusquedasControl extends M.Control {
           console.log(styles['intervals'])
           response = new M.style.Choropleth(field, [styles['initcolor'], styles['finalcolor']], () => (styles['intervals']));
           /* hay que hablar con sigc para ver como podemos meter un valor por defecto para lo que no tiene de dato o es secreto estadístico */
-          // console.log(response)
-          // console.log(response.layer_)
-          // console.log(response.getAttributeName())
-          // console.log(response.getChoroplethStyles())
-          // console.log(response.getStyles())
-          // response.on('M.evt.CHANGE',()=>{
-          //   console.log(response.getStyles())
-          // })
-
           break
         default:
           response = new M.style.Category(field)
