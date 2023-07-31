@@ -57,10 +57,10 @@ map.setBGColorContainer('white');
 map.addControls(['scale', 'scaleline', 'mouse', 'panzoombar', 'layerswitcher']);
 
 
-var configuracion = {
+let configuracion = {
   config: {
     title: 'Test Elasticsearch',
-    url: 'http://localhost/geobusquedas'
+    url: 'https://elasticlab.ieca.junta-andalucia.es'
   },
   options: {
     position: 'TL',
