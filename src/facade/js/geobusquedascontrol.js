@@ -45,8 +45,8 @@ export default class GeobusquedasControl extends M.Control {
     this._my_headers.set('Content-Type', 'application/json; charset=utf-8')
 
     //Número maximo de documentos devueltos por elastic
-    // this.MAX_QUERY_SIZE = 60000;
-    this.MAX_QUERY_SIZE = 10000;
+    this.MAX_QUERY_SIZE = 60000;
+    // this.MAX_QUERY_SIZE = 10000;
     this.IndexsListoptions = new Array();
     this.config_ = config;
     this.activePanel = 1;
@@ -72,6 +72,14 @@ export default class GeobusquedasControl extends M.Control {
       }
     ]
 
+    this.estilo = new M.style.Generic({
+      polygon: {
+        stroke: {
+          color: '#6c6c6c',
+          width: 0.5,
+        }
+      }
+    });
 
     // Se sobreescribe el estilo por defecto de choropleth
     M.style.Choropleth.DEFAULT_STYLE = function (c) {
@@ -243,13 +251,13 @@ export default class GeobusquedasControl extends M.Control {
     /***************************************/
     /* SE CREAN Y CONFIGURAR LOS CHOICE.JS */
     /***************************************/
-    this.choicesSelectIndexTab1EL = new Choices(this.selectIndexTab1EL, { allowHTML: true, placeholderValue: 'Seleccione un indice', placeholder: true, searchPlaceholderValue: 'Seleccione un indice', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true });
-    this.choicesSelectFieldsTab1EL = new Choices(this.selectFieldsTab1EL, { allowHTML: true, placeholderValue: 'Seleccione un campo', placeholder: true, searchPlaceholderValue: 'Seleccione un campo', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true, removeItems: true, removeItemButton: true, });
-    this.choicesSelectFieldsFiltersTab1EL = new Choices(this.selectFieldsFiltersTab1EL, { allowHTML: true, placeholderValue: 'Seleccione un campo para filtrar', placeholder: true, searchPlaceholderValue: 'Seleccione un campo', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true, removeItems: true, removeItemButton: true, });
-    this.choicesSelectSpatialFiltersTab1EL = new Choices(this.selectSpatialFiltersTab1EL, { choices: this.SelectOptionsSpatialFilter, allowHTML: true, placeholderValue: 'Seleccione filtro espacial', placeholder: true, searchPlaceholderValue: 'Seleccione filtro espacial', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true, removeItems: true, removeItemButton: false, });
-    this.choicesSelectAdvancedStylesFieldTab1EL = new Choices(this.selectAdvancedStylesFieldTab1EL, { allowHTML: true, placeholderValue: 'Seleccione un campo', placeholder: true, searchPlaceholderValue: 'Seleccione un campo', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true, removeItems: true, removeItemButton: false, });
-    this.choicesSelectClasificationMethodTab1EL = new Choices(this.selectClasificationMethodTab1EL, { allowHTML: true, placeholderValue: 'Seleccione un método', placeholder: true, searchPlaceholderValue: 'Seleccione un método', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: false, shouldSortItems: false, removeItems: true, removeItemButton: false, });
-    this.choicesSelectorIndicesTab2EL = new Choices(this.selectIndexTab2EL, { allowHTML: true, placeholderValue: 'Seleccione un indice', placeholder: true, searchPlaceholderValue: 'Seleccione un indice', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true });
+    this.choicesSelectIndexTab1EL = new Choices(this.selectIndexTab1EL, { searchResultLimit: 10, allowHTML: true, placeholderValue: 'Seleccione un indice', placeholder: true, searchPlaceholderValue: 'Seleccione un indice', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true });
+    this.choicesSelectFieldsTab1EL = new Choices(this.selectFieldsTab1EL, { searchResultLimit: 10, allowHTML: true, placeholderValue: 'Seleccione un campo', placeholder: true, searchPlaceholderValue: 'Seleccione un campo', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true, removeItems: true, removeItemButton: true, });
+    this.choicesSelectFieldsFiltersTab1EL = new Choices(this.selectFieldsFiltersTab1EL, { searchResultLimit: 10, allowHTML: true, placeholderValue: 'Seleccione un campo para filtrar', placeholder: true, searchPlaceholderValue: 'Seleccione un campo', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true, removeItems: true, removeItemButton: true, });
+    this.choicesSelectSpatialFiltersTab1EL = new Choices(this.selectSpatialFiltersTab1EL, { searchResultLimit: 10, choices: this.SelectOptionsSpatialFilter, allowHTML: true, placeholderValue: 'Seleccione filtro espacial', placeholder: true, searchPlaceholderValue: 'Seleccione filtro espacial', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true, removeItems: true, removeItemButton: false, });
+    this.choicesSelectAdvancedStylesFieldTab1EL = new Choices(this.selectAdvancedStylesFieldTab1EL, { searchResultLimit: 10, allowHTML: true, placeholderValue: 'Seleccione un campo', placeholder: true, searchPlaceholderValue: 'Seleccione un campo', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true, removeItems: true, removeItemButton: false, });
+    this.choicesSelectClasificationMethodTab1EL = new Choices(this.selectClasificationMethodTab1EL, { searchResultLimit: 10, allowHTML: true, placeholderValue: 'Seleccione un método', placeholder: true, searchPlaceholderValue: 'Seleccione un método', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: false, shouldSortItems: false, removeItems: true, removeItemButton: false, });
+    this.choicesSelectorIndicesTab2EL = new Choices(this.selectIndexTab2EL, { searchResultLimit: 10, allowHTML: true, placeholderValue: 'Seleccione un indice', placeholder: true, searchPlaceholderValue: 'Seleccione un indice', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true });
     /***********************************************/
     /* INICIALIZAMOS EL CHOICE DE CAMPOS A DISABLE */
     /***********************************************/
@@ -616,7 +624,7 @@ export default class GeobusquedasControl extends M.Control {
     let okButton = document.querySelector('div.m-button > button');
     console.time('carga de  datos');
 
-    fetch(url, { method: 'POST', headers: this._my_headers, body: JSON.stringify(this.my_request)}).then(res => res.json()
+    fetch(url, { method: 'POST', headers: this._my_headers, body: JSON.stringify(this.my_request) }).then(res => res.json()
     ).then(res => {
       this.removeOverlayLayers();
       let Arrayfeatures = new Array()
@@ -650,6 +658,11 @@ export default class GeobusquedasControl extends M.Control {
           name: indice
         });
 
+        /** test carga capageojson console**/        
+        window.capaGeoJSON = capaGeoJSON;
+        
+
+        capaGeoJSON.setStyle(this.estilo);
         if (this.checkboxStylesEL.checked) {
           let my_style
           if (this.choicesSelectClasificationMethodTab1EL.getValue(true) != 'UNIQUE_VALUES') {
@@ -660,9 +673,39 @@ export default class GeobusquedasControl extends M.Control {
           capaGeoJSON.setStyle(my_style)
           this.map_.addLayers(capaGeoJSON);
         } else {
+          let filter = null;
           let field = this.choicesSelectFieldsTab1EL.getValue(true);
           let my_style = this.createDefaultFieldStyle(field[0], this.indexInfo[indice]['mappings']['_meta']['styles'][field[0]])
-          capaGeoJSON.setStyle(my_style)
+          //si tengo atributo offset
+          if (this.indexInfo[indice]['mappings']['_meta']['styles'][field[0]]['offset']) {
+            //aplico estilo generico
+            capaGeoJSON.setStyle(this.estilo)
+            //recupero valor de offset
+            let offset = this.indexInfo[indice]['mappings']['_meta']['styles'][field[0]]['offset']
+            //compruebo si es numerico
+            if (this.isNumeric(offset)) {
+              offset = Number(offset)
+              //filtro mayor que
+              filter = M.filter.GT(field, offset)
+              console.log('el valor es un número')
+            } else {
+              //filtro texto
+              filter = M.filter.NOT(M.filter.EQUAL(field, offset))
+              console.log('el valor es un texto')
+            }
+            console.log(filter)
+            //aplico el filtro
+            capaGeoJSON.setFilter(filter)
+            //aplico el estilo de choropletas
+            capaGeoJSON.setStyle(my_style);
+            /** test carga filter console**/        
+            window.filter = filter;
+            //elimino filtro
+            capaGeoJSON.setFilter(null)
+          } else {
+            //si en la configuracion no hay offset
+            capaGeoJSON.setStyle(my_style);
+          }
           this.map_.addLayers(capaGeoJSON)
         }
         capaGeoJSON.on(M.evt.LOAD, () => {
@@ -897,7 +940,7 @@ export default class GeobusquedasControl extends M.Control {
     // let url = this.config_.url + '/' + indice + '/search?'
     let url = this.config_.url + '/' + indice + '/_search?'
 
-    fetch(url, { method: 'POST', headers: this._my_headers, body: JSON.stringify(request)}).then(res => res.json()
+    fetch(url, { method: 'POST', headers: this._my_headers, body: JSON.stringify(request) }).then(res => res.json()
     ).then(res => {
       let response = res;
       let buckets = response['aggregations']['my-agg-name']['buckets'];
@@ -911,7 +954,7 @@ export default class GeobusquedasControl extends M.Control {
         });
       });
 
-      let choiceSelectEL = new Choices(my_select, { allowHTML: true, choices: my_options, placeholderValue: 'Seleccione un valor', placeholder: true, searchPlaceholderValue: 'Seleccione un valor', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true, removeItems: true, removeItemButton: true, });
+      let choiceSelectEL = new Choices(my_select, { searchResultLimit: 10, allowHTML: true, choices: my_options, placeholderValue: 'Seleccione un valor', placeholder: true, searchPlaceholderValue: 'Seleccione un valor', itemSelectText: 'Click para seleccionar', noResultsText: 'No se han encontrado resultados', noChoicesText: 'No hay mas opciones', shouldSort: true, shouldSortItems: true, removeItems: true, removeItemButton: true, });
       my_select.addEventListener('change', () => {
         this.fieldFilterList = new Array();
         this.checkfieldFilterList(my_field)
@@ -968,9 +1011,9 @@ export default class GeobusquedasControl extends M.Control {
       }
     }
 
-    fetch(url, { method: 'POST', headers: this._my_headers, body: JSON.stringify(request)}).then(res => res.json()
+    fetch(url, { method: 'POST', headers: this._my_headers, body: JSON.stringify(request) }).then(res => res.json()
     ).then(res => {
-      let response = JSON.parse(res);
+      let response = res;
       my_input.setAttribute('min', response['aggregations']['fields_stats']['min']);
       my_input.setAttribute('max', response['aggregations']['fields_stats']['max'])
       my_input.setAttribute('placeholder', 'introduce un valor');
@@ -1013,12 +1056,12 @@ export default class GeobusquedasControl extends M.Control {
       }
     }
 
-    fetch(url, { method: 'POST', headers: this._my_headers, body: JSON.stringify(request)}).then(res => res.json()
+    fetch(url, { method: 'POST', headers: this._my_headers, body: JSON.stringify(request) }).then(res => res.json()
     ).then(res => {
       let response = res;
 
       console.log(response)
-     })
+    })
 
     // M.remote.post(url, request).then((res) => {
     //   let response = JSON.parse(res.text);
@@ -1344,5 +1387,9 @@ export default class GeobusquedasControl extends M.Control {
       response = new M.style.Category(field)
     }
     return response
+  }
+
+  isNumeric(n) {
+    return !isNaN(parseFloat(n)) && isFinite(n);
   }
 }
